@@ -173,7 +173,7 @@ html[data-theme="dark"] .auth-tabs button{color:var(--text-secondary)}
 html[data-theme="dark"] .auth-tabs button.active{background:#2a382f;color:#a9e6bd;box-shadow:0 2px 8px rgba(0,0,0,.22)}
 html[data-theme="dark"] .radio-option{border-color:var(--border);background:#202a24;color:var(--text-secondary)}
 html[data-theme="dark"] .auth-close:hover,html[data-theme="dark"] .social-modal-close:hover{background:#2d3a31;color:#eff7f1}
-html[data-theme="dark"] .social-modal-icon{background:#294031;color:#a7e5bb}
+html[data-theme="dark"] .social-modal-icon{background:transparent;color:#a7e5bb;box-shadow:none}html[data-theme="dark"] .save-prompt-heart{fill:#26382d;stroke:#a7e5bb}html[data-theme="dark"] .save-prompt-spark{stroke:#5bc58d}
 html[data-theme="dark"] .report-reasons label{border-color:#394840;background:#202a24;color:var(--text-secondary)}
 html[data-theme="dark"] .report-reasons label:has(input:checked){border-color:#5b9a70;background:#293b30;color:#e2f5e7}
 html[data-theme="dark"] .report-success .social-modal-icon{background:#294031;color:#a7e5bb}
@@ -730,3 +730,4 @@ html[data-theme="dark"] .auth-card-register .auth-role-field .radio-option:has(i
     stroke: currentColor;
   }
 }
+html[data-theme="dark"] .social-modal-close{border-color:#506757;background:#29352e;color:#e1efe4;box-shadow:0 2px 9px rgba(0,0,0,.28)}html[data-theme="dark"] .social-modal-close:hover{border-color:#75bd91;background:#355341;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.36);transform:rotate(90deg)}

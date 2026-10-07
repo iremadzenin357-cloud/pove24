@@ -108,3 +108,8 @@ html[data-theme="dark"] .post-date-options button.selected{border-color:#67a77c;
     color: var(--text-primary, #445347) !important;
   }
 }
+
+.worker-skills-field.has-category-error .category-trigger{border-color:#bd5147;box-shadow:0 0 0 3px rgba(189,81,71,.14)}
+.worker-city-field.has-city-error .location-control input{border-color:#bd5147;box-shadow:0 0 0 3px rgba(189,81,71,.14)}
+#workerProfileForm .field.has-worker-validation-error>input,#workerProfileForm .field.has-worker-validation-error>textarea,#postForm .field.has-post-validation-error>input,#postForm .field.has-post-validation-error>textarea{border-color:#bd5147;box-shadow:0 0 0 3px rgba(189,81,71,.14)}
+#workerProfileForm .site-form-select-field.has-worker-validation-error .site-filter-trigger,#postForm .site-form-select-field.has-post-validation-error .site-filter-trigger,#postForm .location-field.has-post-validation-error .location-control input,#postForm .category-field.has-post-validation-error .category-trigger,#postForm .field.has-post-validation-error .ka-date-trigger{border-color:#bd5147;box-shadow:0 0 0 3px rgba(189,81,71,.14)}

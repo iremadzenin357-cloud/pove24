@@ -11,7 +11,7 @@ updateWorkers=function(){
   const payMatches=!rangeActive||negotiable||Number.isFinite(pay)&&(min===null||pay>=min)&&(max===null||pay<=max);
   const skillText=Array.isArray(profile.skills)?profile.skills.flatMap(skill=>typeof skill==='string'?[skill]:[skill?.main,skill?.sub]).filter(Boolean):[];
   const searchableText=[profile.offer,profile.offerTitle,profile.category,profile.subcategory,...skillText,profile.about].filter(Boolean).join(' ').toLocaleLowerCase('ka');
-  return(!city||String(profile.city||'').toLocaleLowerCase('ka').includes(city))&&districtSelectionMatches(area,profile.area||profile.district)&&workerMatchesCategory(profile,selections)&&(!query||searchableText.includes(query))&&(!paymentType||profilePaymentType===paymentType)&&payMatches
+  return(!city||String(profile.city||'').toLocaleLowerCase('ka').includes(city))&&(!area||!String(profile.area||profile.district||'').trim()||districtSelectionMatches(area,profile.area||profile.district))&&workerMatchesCategory(profile,selections)&&(!query||searchableText.includes(query))&&(!paymentType||profilePaymentType===paymentType)&&payMatches
  });
  el.innerHTML=matches.length?matches.map(workerCard).join(''):`<div class="empty" style="grid-column:1/-1"><strong>ადამიანები ვერ მოიძებნა</strong>შეცვალე ფილტრები ან სხვა ქალაქში სცადე ძებნა.</div>`
 };

@@ -1,4 +1,4 @@
-body.auth-page-active{background:#f5f7f5}
+body.auth-page-active{background:var(--background,#f5f7f5)}
 .auth-page-active .header,.auth-page-active .footer,.auth-page-active .intent-dock{display:none!important}
 .auth-page-active #app{min-height:100vh;min-height:100svh}
 .auth-screen{min-height:100vh;min-height:100svh;display:grid;place-items:center;padding:36px 18px;background:#f5f7f5}
