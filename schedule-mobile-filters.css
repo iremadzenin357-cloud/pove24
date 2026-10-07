@@ -1,0 +1,326 @@
+/* Mobile-only collapsed filters for the daily-work search form. */
+.additional-primary-filters,
+.mobile-additional-filters,
+.mobile-filter-toggle,
+.mobile-filter-submit {
+  display: contents;
+}
+
+.mobile-filter-toggle,
+.mobile-filter-submit {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .schedule-filter-panel .primary-search,
+  .schedule-filter-panel .quick-date-field {
+    grid-column: 1 / -1;
+  }
+
+  .schedule-filter-panel .additional-primary-filters {
+    display: none;
+  }
+
+  .schedule-filter-panel .mobile-filter-toggle {
+    display: flex;
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 13px;
+    border: 1px solid var(--border, #dfe7e1);
+    border-radius: 10px;
+    background: var(--surface-elevated, #fff);
+    color: var(--text-primary, #26372d);
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .schedule-filter-panel .mobile-filter-chevron {
+    flex: none;
+    transition: transform .18s ease;
+  }
+
+  .schedule-filter-panel.additional-filters-open .mobile-filter-chevron {
+    transform: rotate(180deg);
+  }
+
+  .schedule-filter-panel .mobile-additional-filters {
+    display: none;
+  }
+
+  .schedule-filter-panel.additional-filters-open .additional-primary-filters {
+    display: contents;
+  }
+
+  .schedule-filter-panel.additional-filters-open .mobile-additional-filters {
+    display: block;
+  }
+
+  .schedule-filter-panel .additional-primary-filters > .field {
+    grid-column: 1 / -1;
+  }
+
+  .schedule-filter-panel .secondary-filters > .filter-actions {
+    display: none;
+  }
+
+  .schedule-filter-panel .mobile-filter-submit {
+    display: block;
+  }
+
+  .schedule-filter-panel .mobile-filter-submit .btn {
+    width: 100%;
+    min-height: 46px;
+  }
+
+  .schedule-filter-panel .quick-date-field .quick-date-options {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  .schedule-filter-panel .quick-date-field .quick-date {
+    min-width: 0;
+    width: 100%;
+    flex: none;
+    white-space: normal;
+  }
+}
+
+/* On mobile, reveal location fields before the quick date choices. */
+.mobile-location-fields {
+  display: contents;
+}
+
+@media (max-width: 760px) {
+  .schedule-filter-panel .mobile-filter-toggle {
+    order: 1;
+  }
+
+  .schedule-filter-panel.additional-filters-open .additional-primary-filters > .mobile-location-fields {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+    order: 2;
+  }
+
+  .schedule-filter-panel.additional-filters-open .additional-primary-filters > .quick-date-field {
+    order: 3;
+  }
+
+  .schedule-filter-panel .mobile-location-fields > .field {
+    grid-column: 1 / -1;
+  }
+}
+/* Make the location dropdown chevron an actual, keyboard accessible control. */
+.location-control:after {
+  content: none !important;
+}
+
+.location-control .location-toggle {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 3px;
+  display: grid;
+  width: 32px;
+  height: 32px;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: #718077;
+  cursor: pointer;
+  transform: translateY(-50%);
+}
+
+.location-control .location-toggle svg {
+  transition: transform .16s ease;
+}
+
+.location-control .location-toggle[aria-expanded="true"] svg {
+  transform: rotate(180deg);
+}
+
+.location-control .location-toggle:hover:not(:disabled) {
+  background: var(--accent-soft, #eaf3ed);
+  color: var(--accent, #176b51);
+}
+
+.location-control .location-toggle:focus-visible {
+  outline: 2px solid var(--focus-ring, #75b68e);
+  outline-offset: 1px;
+}
+
+.location-control .location-toggle:disabled {
+  opacity: .45;
+  cursor: not-allowed;
+}
+
+.location-control input {
+  padding-right: 42px;
+}
+/* The worker-search page shares the mobile collapsible-filter control. */
+.worker-mobile-additional {
+  display: contents;
+}
+
+.worker-filter-extended .worker-mobile-filter-toggle {
+  display: none;
+}
+
+@media (max-width: 760px) {
+  .worker-filter-extended .worker-mobile-filter-toggle {
+    display: flex;
+    grid-column: 1 / -1;
+    width: 100%;
+    min-height: 44px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    padding: 10px 13px;
+    border: 1px solid var(--border, #dfe7e1);
+    border-radius: 10px;
+    background: var(--surface-elevated, #fff);
+    color: var(--text-primary, #26372d);
+    font: inherit;
+    font-weight: 600;
+    text-align: left;
+    cursor: pointer;
+  }
+
+  .worker-filter-extended .worker-mobile-additional {
+    display: none;
+  }
+
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .worker-filter-extended.additional-filters-open #workerSearch {
+    grid-column: 1 / -1;
+  }
+
+  .worker-filter-extended .mobile-filter-chevron {
+    flex: none;
+    transition: transform .18s ease;
+  }
+
+  .worker-filter-extended.additional-filters-open .mobile-filter-chevron {
+    transform: rotate(180deg);
+  }
+}
+/* Give the mobile category and payment controls the same column width. */
+@media (max-width: 760px) {
+  .worker-filter-extended .worker-mobile-additional > .category-field {
+    grid-column: auto;
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .worker-filter-extended .category-picker-multiple {
+    width: 100%;
+    max-width: 100%;
+  }
+
+  .worker-filter-extended .category-picker-multiple > .category-trigger {
+    width: 100%;
+    max-width: 100%;
+    min-height: 36px;
+    height: auto;
+    gap: 6px;
+    padding-inline: 7px;
+    white-space: normal;
+  }
+
+  .worker-filter-extended .category-picker-multiple > .category-trigger > span:first-child {
+    min-width: 0;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+}
+/* Keep worker city and district controls on the same mobile row. */
+.worker-location-row {
+  display: contents;
+}
+
+@media (max-width: 760px) {
+  .worker-filter-extended.additional-filters-open .worker-location-row {
+    display: grid;
+    grid-column: 1 / -1;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 12px;
+  }
+
+  .worker-filter-extended.additional-filters-open .worker-location-row > .location-field {
+    grid-column: auto;
+    width: 100%;
+    min-width: 0;
+  }
+}
+/* Keep worker payment and salary fields inside the mobile grid. */
+@media (max-width: 760px) {
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional {
+    row-gap: 8px;
+  }
+
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional > .category-field,
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional > .payment-filter-field {
+    grid-column: auto;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    justify-self: stretch;
+    box-sizing: border-box;
+  }
+
+  .worker-filter-extended .worker-mobile-additional > .category-field .category-picker-multiple,
+  .worker-filter-extended .worker-mobile-additional > .payment-filter-field .site-filter-select {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box;
+  }
+
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional > .payment-filter-field,
+  .worker-filter-extended.additional-filters-open .worker-mobile-additional > .worker-min-pay-field {
+    grid-column: auto;
+    min-width: 0;
+  }
+
+  .worker-filter-extended .category-picker-multiple > .category-trigger,
+  .worker-filter-extended .payment-filter-field .site-filter-trigger {
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .worker-filter-extended .category-picker-multiple > .category-trigger {
+    height: 36px;
+    gap: 6px;
+    padding-inline: 7px;
+  }
+}
+@media (max-width: 760px) {
+  .schedule-filter-panel .mobile-filter-submit {
+    margin-top: 12px;
+  }
+}
+
+/* Match the mobile category and payment control heights. */
+@media (max-width: 760px) {
+  .schedule-filter-panel .secondary-filters > .category-field .category-trigger,
+  .schedule-filter-panel .secondary-filters > .payment-filter-field .site-filter-trigger {
+    height: 46px;
+    min-height: 46px;
+    box-sizing: border-box;
+  }
+}

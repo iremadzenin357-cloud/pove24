@@ -1,0 +1,55 @@
+.visually-hidden{position:absolute!important;width:1px!important;height:1px!important;padding:0!important;margin:-1px!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;white-space:nowrap!important;border:0!important}
+.market-avatar,.day-avatar{display:inline-flex;align-items:center;justify-content:center;flex:0 0 var(--avatar-size,46px);width:var(--avatar-size,46px);height:var(--avatar-size,46px);overflow:hidden;border-radius:50%;background:#edf2ed;color:#315f42;vertical-align:middle}
+.market-avatar img,.market-avatar svg,.day-avatar img,.day-avatar svg{display:block;width:100%;height:100%;object-fit:cover}
+.market-avatar svg{overflow:hidden}
+.profile-photo-card{display:flex;align-items:center;justify-content:space-between;gap:24px;padding:24px;margin-bottom:24px;border:1px solid #e4e9e3;border-radius:16px;background:#fff}
+.profile-photo-card>div:first-child{max-width:430px}
+.profile-photo-card h2{margin:4px 0 7px;font-size:20px}
+.profile-photo-card p,.profile-photo-hint{margin:0;color:#68736b;font-size:14px;line-height:1.5}
+.profile-photo-editor{display:flex;align-items:center;gap:18px;flex-wrap:wrap}
+.profile-photo-current{display:flex;align-items:center;justify-content:center;flex:0 0 auto}
+.profile-photo-avatar{box-shadow:0 0 0 4px #f4f7f3}
+.profile-photo-actions{display:flex;align-items:center;gap:8px;flex-wrap:wrap}
+.profile-photo-actions .btn,.profile-photo-preview .btn{min-height:44px}
+.photo-skip{min-height:44px;padding:0 12px;border:0;background:transparent;color:#59665c;font:inherit;cursor:pointer}
+.photo-skip:hover{color:#315f42;text-decoration:underline}
+.photo-delete[hidden]{display:none}
+.profile-photo-hint{flex-basis:100%;font-size:12px}
+.profile-photo-preview{flex-basis:100%;display:grid;grid-template-columns:auto 1fr;align-items:center;gap:5px 14px;padding:14px;border:1px solid #e2e9e1;border-radius:12px;background:#f8faf7}
+.profile-photo-preview[hidden]{display:none}
+.profile-photo-preview>[data-photo-preview-avatar]{grid-row:span 2}
+.profile-photo-preview-avatar{width:64px;height:64px}
+.profile-photo-preview>p{margin:0;color:#68736b;font-size:13px}
+.profile-photo-preview>div:last-child{display:flex;gap:8px;flex-wrap:wrap}
+.registration-photo-section{margin-top:18px;padding:16px;border:1px solid #e4e9e3;border-radius:14px;background:#fbfcfa}
+.registration-photo-section h3{margin:0 0 14px;font-size:16px}
+.optional-label{margin-left:5px;color:#78827b;font-size:12px;font-weight:400}
+.photo-delete-backdrop{z-index:1000}
+.photo-delete-dialog{width:min(460px,calc(100vw - 32px));padding:28px}
+.photo-delete-dialog h2{padding-right:26px;font-size:20px;line-height:1.4}
+.photo-delete-actions{display:flex;justify-content:flex-end;gap:10px;margin-top:22px}
+.photo-delete-actions button{min-height:44px}
+.worker-profile-heading,.public-profile-heading{display:flex;align-items:center;gap:20px;min-width:0}
+.worker-profile-heading h1{margin:0 0 4px;overflow-wrap:anywhere}
+.review-author{display:flex;align-items:center;gap:9px;min-width:0}
+.review-author small{overflow-wrap:anywhere}
+.admin-user-name{display:flex;align-items:center;gap:9px;min-width:0}
+.admin-user-name .market-avatar{--avatar-size:34px;flex:0 0 34px}
+@media(max-width:640px){
+ .profile-photo-card{flex-direction:column;align-items:stretch;gap:18px;padding:18px}
+ .profile-photo-editor{justify-content:center;text-align:center;gap:12px}
+ .profile-photo-current{width:100%}
+ .profile-photo-actions{justify-content:center;width:100%}
+ .profile-photo-actions .btn{flex:1 1 140px}
+ .profile-photo-hint{text-align:center}
+ .profile-photo-preview{grid-template-columns:1fr;justify-items:center;text-align:center}
+ .profile-photo-preview>[data-photo-preview-avatar]{grid-row:auto}
+ .profile-photo-preview>div:last-child{justify-content:center;width:100%}
+ .profile-photo-preview .btn{flex:1 1 120px}
+ .registration-photo-section{padding:14px}
+ .worker-profile-heading,.public-profile-heading{align-items:flex-start;gap:14px}
+ .worker-profile-heading .market-avatar,.public-profile-heading .market-avatar{--avatar-size:82px!important;flex-basis:82px}
+ .photo-delete-dialog{padding:22px 18px}
+ .photo-delete-actions{flex-direction:column-reverse}
+ .photo-delete-actions button{width:100%}
+}

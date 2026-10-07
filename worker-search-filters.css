@@ -1,0 +1,27 @@
+.worker-filter-extended{grid-template-columns:repeat(4,minmax(0,1fr))}
+.worker-filter-extended #workerSearch{width:100%;min-height:46px}
+#workerResults>.worker-card>.skills>.skill-overflow{display:none!important}
+#workerResults>.worker-card>.skills>.skill-more{display:inline-flex!important;align-items:center;justify-content:center;min-width:36px;min-height:32px;padding:4px 10px;font-size:16px;line-height:1}
+.worker-offer{display:grid;gap:3px;margin:0 0 10px;padding:9px 11px;border:1px solid var(--border);border-radius:9px;background:var(--accent-soft);color:var(--text-primary)}
+.worker-offer small{color:var(--text-secondary);font-size:11px}
+.worker-offer strong{display:-webkit-box;overflow:hidden;-webkit-box-orient:vertical;-webkit-line-clamp:2;font-size:14px;line-height:1.45;overflow-wrap:anywhere}
+.worker-offer-detail{white-space:pre-wrap;overflow-wrap:anywhere}
+#workerResults>.worker-card>.listing-view-count{display:none!important}
+#workerResults>.worker-card.worker-offer-focused{display:grid;grid-template-columns:54px minmax(0,1fr);grid-template-areas:"avatar name" "avatar location" "avatar rating" "offer offer" "skills skills" "about about" "stats stats" "views views" "button button";align-items:center;column-gap:12px;row-gap:0;padding:25px 22px 22px;text-align:left}
+#workerResults>.worker-card.worker-offer-focused>.market-avatar{grid-area:avatar;--avatar-size:52px!important;flex-basis:52px!important;justify-self:start;align-self:center;margin:0!important}
+#workerResults>.worker-card.worker-offer-focused>h3{grid-area:name;align-self:end;margin:0;padding-right:96px;overflow-wrap:anywhere;font-size:15px;line-height:1.3;font-weight:600}
+#workerResults>.worker-card.worker-offer-focused>.rating-inline{grid-area:rating;justify-self:start;max-width:calc(100% - 88px);margin:0;padding:0;border:0;background:transparent;text-align:left;font-size:10px;line-height:1.3}
+#workerResults>.worker-card.worker-offer-focused>p:first-of-type{grid-area:location;align-self:start;margin:0;padding-right:12px;text-align:left;font-size:12px;line-height:1.45}
+#workerResults>.worker-card.worker-offer-focused>.worker-offer{grid-area:offer;margin:11px 0 12px;padding:14px 16px;border-radius:11px}
+#workerResults>.worker-card.worker-offer-focused>.worker-offer strong{font-size:18px;line-height:1.45;-webkit-line-clamp:3}
+#workerResults>.worker-card.worker-offer-focused>.skills{grid-area:skills;justify-content:flex-start;margin:0 0 8px}
+#workerResults>.worker-card.worker-offer-missing{grid-template-areas:"avatar name" "avatar location" "avatar rating" "skills skills" "about about" "stats stats" "views views" "button button"}
+#workerResults>.worker-card.worker-offer-focused>p:nth-of-type(2){grid-area:about;margin:3px 0 0;text-align:left;font-size:13px;line-height:1.55}
+#workerResults>.worker-card.worker-offer-focused>.worker-stats{grid-area:stats;width:100%;margin-top:12px}
+#workerResults>.worker-card.worker-offer-focused>.listing-view-count{grid-area:views;justify-self:center;margin:9px auto 0}
+#workerResults>.worker-card.worker-offer-focused>.btn{grid-area:button;width:100%;margin:12px 0 0!important}
+@media(max-width:480px){#workerResults>.worker-card.worker-offer-focused{grid-template-columns:48px minmax(0,1fr);padding:23px 18px 18px}#workerResults>.worker-card.worker-offer-focused>.market-avatar{--avatar-size:46px!important;flex-basis:46px!important}#workerResults>.worker-card.worker-offer-focused>h3{padding-right:86px;font-size:14px}#workerResults>.worker-card.worker-offer-focused>.rating-inline{max-width:calc(100% - 80px)}}
+@media(max-width:760px){
+ .worker-filter-extended{grid-template-columns:repeat(2,minmax(0,1fr))}
+ .worker-filter-extended .worker-need-field,.worker-filter-extended .category-field,.worker-filter-extended #workerSearch{grid-column:1/-1}
+}

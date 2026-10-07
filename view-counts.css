@@ -1,0 +1,13 @@
+.listing-view-count{display:inline-flex;align-items:center;gap:5px;color:var(--muted,#77847b);font-size:11px;font-weight:500;line-height:1.4;white-space:nowrap}
+.listing-view-count svg{display:block;width:15px;height:15px;flex:none;fill:none;stroke:currentColor;stroke-width:1.7;stroke-linecap:round;stroke-linejoin:round}
+.job-card>.posted{display:flex;align-items:center;justify-content:space-between;gap:4px 10px;flex-wrap:wrap}
+.worker-card>.listing-view-count{justify-content:center;margin:12px auto 0}
+.detail-main>.meta>.detail-view-count{margin-left:auto}
+@media(max-width:480px){.listing-view-count{font-size:10px;gap:4px}.listing-view-count svg{width:14px;height:14px}.detail-main>.meta>.detail-view-count{margin-left:0}}
+.detail-main-footer{display:flex;align-items:center;justify-content:space-between;gap:14px;margin-top:27px;min-width:0}
+.detail-main-footer>.report-link{flex:1;margin:0}
+.detail-publication-meta{display:flex;align-items:center;justify-content:flex-end;gap:17px;flex:none;color:var(--text-secondary,#647168)}
+.detail-publication-meta .listing-view-count,.detail-published-at{display:inline-flex;align-items:center;gap:5px;color:inherit;font-size:12px;line-height:1.4;white-space:nowrap}
+.detail-published-at .day-icon{width:15px;height:15px}
+html[data-theme="dark"] .detail-publication-meta{color:#c4d1c8}
+@media(max-width:480px){.detail-main-footer{gap:8px;margin-top:22px}.detail-publication-meta{gap:10px}.detail-publication-meta .listing-view-count,.detail-published-at{font-size:10px}.detail-main-footer>.report-link{font-size:10px}}

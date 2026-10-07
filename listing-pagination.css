@@ -1,0 +1,2753 @@
+.listing-pagination {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 8px;
+  margin: 24px 0 4px;
+}
+
+@media (max-width: 620px) {
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused {
+    display: grid !important;
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "avatar name"
+      "location location"
+      "offer offer"
+      "skills skills"
+      "about about"
+      "stats stats"
+      "views views"
+      "button button" !important;
+    align-items: center;
+    column-gap: 6px;
+    row-gap: 4px;
+    padding: 9px 7px;
+    text-align: left;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .market-avatar,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .market-avatar {
+    grid-area: avatar !important;
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin: 0 !important;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > h3,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > h3 {
+    grid-area: name !important;
+    min-width: 0;
+    max-height: 2.6em;
+    margin: 0 !important;
+    padding-right: 24px !important;
+    overflow: hidden;
+    font-size: 10px !important;
+    line-height: 1.3;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > p:first-of-type,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > p:first-of-type {
+    grid-area: location !important;
+    margin: 0 !important;
+    font-size: 8px;
+    line-height: 1.3;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-offer,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer {
+    grid-area: offer !important;
+    margin: 2px 0 0 !important;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .rating-inline,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .rating-inline {
+    display: none !important;
+  }
+}
+
+#app .job-card,
+#app .worker-card {
+  cursor: pointer;
+}
+
+.listing-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 18px;
+  min-width: 0;
+  margin: 0 0 17px;
+  padding: 0 0 13px;
+  border-bottom: 1px solid var(--border);
+}
+
+.listing-toolbar--jobs {
+  margin-top: 13px;
+}
+
+.listing-toolbar-copy {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  min-width: 0;
+}
+
+.listing-result-count {
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.5;
+}
+
+.listing-result-count strong {
+  color: var(--text-primary);
+  font-weight: 700;
+}
+
+.listing-toolbar-detail {
+  overflow: hidden;
+  color: var(--text-muted);
+  font-size: 11px;
+  line-height: 1.4;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listing-toolbar-controls {
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  gap: 9px;
+  min-width: 0;
+}
+
+.listing-sort-control {
+  position: relative;
+  display: block;
+  min-width: 0;
+  margin: 0;
+}
+
+.listing-sort-trigger {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  width: min(100%, 245px);
+  min-width: 190px;
+  height: 42px;
+  padding: 0 12px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--input-background);
+  color: var(--text-primary);
+  font: inherit;
+  font-size: 12px;
+  cursor: pointer;
+}
+
+.listing-sort-trigger > span {
+  display: flex;
+  align-items: baseline;
+  gap: 7px;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listing-sort-type {
+  color: var(--text-muted);
+  font-size: 10px;
+  font-weight: 600;
+}
+
+.listing-sort-trigger > svg {
+  width: 16px;
+  height: 16px;
+  flex: 0 0 auto;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.7;
+  transition: transform .18s ease;
+}
+
+.listing-sort-trigger[aria-expanded="true"] > svg {
+  transform: rotate(180deg);
+}
+
+.listing-sort-trigger:hover,
+.listing-sort-trigger[aria-expanded="true"] {
+  border-color: var(--accent);
+}
+
+.listing-sort-trigger:focus-visible {
+  border-color: var(--accent);
+  outline: 0;
+  box-shadow: 0 0 0 3px color-mix(in srgb, var(--accent) 20%, transparent);
+}
+
+.listing-sort-control.has-payment-type .listing-sort-trigger {
+  padding-right: 58px;
+}
+
+.listing-sort-clear {
+  position: absolute;
+  z-index: 2;
+  top: 50%;
+  right: 34px;
+  display: grid;
+  width: 20px;
+  height: 20px;
+  place-items: center;
+  padding: 0;
+  transform: translateY(-50%);
+  border: 1px solid var(--border);
+  border-radius: 50%;
+  background: var(--surface-elevated, var(--surface));
+  color: var(--text-muted);
+  font: inherit;
+  font-size: 15px;
+  line-height: 1;
+  cursor: pointer;
+  transition: border-color .16s ease, color .16s ease, background-color .16s ease;
+}
+
+.listing-sort-clear:hover,
+.listing-sort-clear:focus-visible {
+  outline: 0;
+  border-color: var(--accent);
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.listing-sort-options {
+  position: absolute;
+  z-index: 40;
+  top: calc(100% + 6px);
+  right: 0;
+  width: max(100%, 245px);
+  max-width: min(320px, calc(100vw - 28px));
+  max-height: min(280px, 60vh);
+  overflow-y: auto;
+  padding: 5px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface-elevated, var(--surface));
+  box-shadow: var(--shadow-popover, 0 12px 30px rgba(0, 0, 0, .24));
+}
+
+.listing-sort-options[hidden] {
+  display: none;
+}
+
+.listing-sort-heading {
+  display: block;
+  padding: 8px 10px 6px;
+  color: var(--text-muted);
+  font-size: 11px;
+  font-weight: 600;
+}
+
+.listing-sort-back {
+  display: block;
+  width: 100%;
+  padding: 7px 10px;
+  border: 0;
+  border-radius: 7px;
+  background: transparent;
+  color: var(--accent);
+  font: inherit;
+  font-size: 11px;
+  text-align: left;
+  cursor: pointer;
+}
+
+.listing-sort-back:hover,
+.listing-sort-back:focus-visible {
+  outline: 0;
+  background: var(--accent-soft);
+  color: var(--accent-hover, var(--accent));
+}
+
+.listing-filter-empty {
+  margin: 12px 0;
+  padding: 16px;
+  border: 1px solid var(--border);
+  border-radius: 12px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font-size: 13px;
+  text-align: center;
+}
+
+.listing-sort-option {
+  display: flex;
+  align-items: center;
+  width: 100%;
+  min-height: 38px;
+  padding: 8px 10px;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-secondary, var(--text-primary));
+  font: inherit;
+  font-size: 12px;
+  line-height: 1.35;
+  text-align: left;
+  cursor: pointer;
+  transition: background-color .16s ease, color .16s ease;
+}
+
+.listing-sort-option:hover,
+.listing-sort-option:focus-visible {
+  outline: 0;
+  background: var(--accent-soft);
+  color: var(--text-primary);
+}
+
+.listing-sort-option.is-selected {
+  background: var(--accent-soft);
+  color: var(--accent);
+  font-weight: 700;
+}
+
+.listing-sort-option.is-selected:focus-visible,
+.listing-sort-option.is-selected:hover {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.listing-view-switch {
+  display: inline-flex;
+  flex: 0 0 auto;
+  align-items: center;
+  gap: 3px;
+  padding: 3px;
+  border: 1px solid var(--border);
+  border-radius: 11px;
+  background: var(--surface);
+}
+
+.listing-view-switch button {
+  width: 35px;
+  height: 34px;
+  display: inline-grid;
+  place-items: center;
+  padding: 0;
+  border: 0;
+  border-radius: 8px;
+  background: transparent;
+  color: var(--text-muted);
+  cursor: pointer;
+  transition: background-color .18s ease, color .18s ease;
+}
+
+.listing-view-switch button.is-active {
+  background: var(--accent-soft);
+  color: var(--accent);
+}
+
+.listing-view-switch svg {
+  width: 18px;
+  height: 18px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 1.8;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.visually-hidden {
+  position: absolute !important;
+  width: 1px !important;
+  height: 1px !important;
+  padding: 0 !important;
+  margin: -1px !important;
+  overflow: hidden !important;
+  clip: rect(0, 0, 0, 0) !important;
+  white-space: nowrap !important;
+  border: 0 !important;
+}
+
+.listing-pagination-actions {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 7px;
+}
+
+.listing-page-button {
+  min-width: 42px;
+  height: 42px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 5px;
+  padding: 0 11px;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+  background: var(--surface);
+  color: var(--text-secondary);
+  font: inherit;
+  font-size: 13px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: background-color .18s ease, border-color .18s ease, color .18s ease, transform .18s ease;
+}
+
+.listing-page-button:hover:not(:disabled) {
+  border-color: var(--accent);
+  color: var(--accent);
+  transform: translateY(-1px);
+}
+
+.listing-page-button.is-current {
+  border-color: var(--accent);
+  background: var(--accent);
+  color: #fff;
+}
+
+html[data-theme="dark"] .listing-page-button.is-current {
+  color: #132219;
+}
+
+.listing-page-button:disabled {
+  opacity: .42;
+  cursor: default;
+}
+
+.listing-page-button svg {
+  width: 17px;
+  height: 17px;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.listing-pagination-summary {
+  color: var(--text-muted);
+  font-size: 12px;
+  line-height: 1.5;
+}
+
+#jobResults .job-grid > .job-card[hidden],
+#workerResults > .worker-card[hidden] {
+  display: none !important;
+}
+
+/* Switch announcement cards between a visual grid and a full-width list. */
+#jobResults .job-grid.is-list-view {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+#jobResults .job-grid.is-list-view > .job-card {
+  position: relative;
+  display: grid !important;
+  grid-template-columns: minmax(0, 1fr) minmax(170px, 220px);
+  grid-template-areas:
+    "top ."
+    "title ."
+    "meta payment"
+    "description detail";
+  align-items: start;
+  gap: 7px 20px;
+  min-height: 0;
+}
+
+#jobResults .job-grid.is-list-view > .job-card > .card-top { grid-area: top; position: static; }
+#jobResults .job-grid.is-list-view > .job-card > .card-top > .save-btn {
+  position: absolute;
+  z-index: 2;
+  top: 20px;
+  right: 20px;
+  margin: 0;
+}
+#jobResults .job-grid.is-list-view > .job-card > h3 { grid-area: title; margin: 2px 0; }
+#jobResults .job-grid.is-list-view > .job-card > .schedule-card-meta,
+#jobResults .job-grid.is-list-view > .job-card > .meta { grid-area: meta; }
+#jobResults .job-grid.is-list-view > .job-card > .job-description { grid-area: description; }
+#jobResults .job-grid.is-list-view > .job-card > .card-bottom {
+  display: contents !important;
+}
+#jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price {
+  grid-area: payment;
+  align-self: end;
+  justify-self: start;
+  margin: 0;
+  font-size: 19px;
+  line-height: 1.3;
+}
+#jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price.price-fixed {
+  white-space: nowrap;
+  font-size: 18px;
+}
+#jobResults .job-grid.is-list-view > .job-card > .card-bottom > .btn {
+  grid-area: detail;
+  align-self: center;
+  width: 100%;
+  margin: 0;
+  min-height: 50px;
+  padding-block: 12px;
+  font-size: 15px;
+}
+#jobResults .job-grid.is-list-view > .job-card > .posted { display: none !important; }
+
+#workerResults.is-list-view {
+  grid-template-columns: minmax(0, 1fr);
+  gap: 12px;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused {
+  grid-template-columns: 54px minmax(0, 1fr) minmax(220px, 258px);
+  grid-template-areas:
+    "avatar name name"
+    "avatar location location"
+    "avatar rating rating"
+    "offer offer offer"
+    "skills skills stats"
+    "about about button";
+  align-items: start;
+  column-gap: 16px;
+  row-gap: 7px;
+  padding: 20px 22px;
+  border-color: color-mix(in srgb, var(--border) 82%, var(--accent));
+  border-radius: 17px;
+  background: var(--surface);
+  box-shadow: var(--shadow-surface);
+  transition: border-color .18s ease, box-shadow .18s ease, transform .18s ease;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused:hover {
+  border-color: color-mix(in srgb, var(--border) 58%, var(--accent));
+  box-shadow: var(--shadow-hover);
+  transform: translateY(-2px);
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .market-avatar {
+  align-self: start;
+  margin-top: 1px !important;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > h3 {
+  align-self: end;
+  margin: 0;
+  padding-right: 104px;
+  font-size: 16px;
+  line-height: 1.35;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > p:first-of-type {
+  align-self: start;
+  margin: 2px 0 0;
+  color: var(--text-secondary);
+  font-size: 12px;
+  line-height: 1.45;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .rating-inline {
+  justify-self: start;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-align: left;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer {
+  align-self: start;
+  width: fit-content;
+  max-width: 100%;
+  margin: 7px 0 2px;
+  padding: 13px 16px;
+  border-radius: 12px;
+  border-left: 3px solid var(--accent);
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer strong {
+  font-size: 18px;
+  line-height: 1.45;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .skills {
+  align-self: start;
+  justify-content: flex-start;
+  gap: 7px;
+  margin: 2px 0 0;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > p:nth-of-type(2) {
+  align-self: start;
+  max-width: 900px;
+  margin: 3px 0 0;
+  color: var(--text-secondary);
+  font-size: 13px;
+  line-height: 1.6;
+  display: -webkit-box;
+  overflow: hidden;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats {
+  align-self: center;
+  margin: 7px 0 2px;
+  padding: 12px 10px;
+  border-color: var(--border);
+  border-radius: 12px;
+  background: var(--surface-elevated);
+  box-shadow: inset 0 1px rgba(255,255,255,.025);
+}
+
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .btn {
+  align-self: end;
+  width: 100%;
+  max-width: none;
+  min-height: 44px;
+  margin: 0 !important;
+  padding-inline: 12px;
+  white-space: nowrap;
+}
+
+@media (max-width: 620px) {
+  .listing-toolbar {
+    align-items: stretch;
+    flex-direction: column;
+    gap: 10px;
+    margin-bottom: 14px;
+    padding-bottom: 12px;
+  }
+
+  .listing-toolbar--jobs {
+    margin-top: 12px;
+  }
+
+  .listing-toolbar-controls {
+    justify-content: space-between;
+    gap: 8px;
+  }
+
+  .listing-sort-control {
+    flex: 1 1 auto;
+  }
+
+  .listing-sort-trigger {
+    width: 100%;
+    min-width: 0;
+  }
+
+  #jobResults .job-grid.is-grid-view,
+  #workerResults.is-grid-view {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    align-items: stretch;
+    gap: 9px;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card {
+    gap: 7px;
+    padding: 12px;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > h3 { font-size: 14px; line-height: 1.4; }
+  #jobResults .job-grid.is-grid-view > .job-card > .schedule-card-meta,
+  #jobResults .job-grid.is-grid-view > .job-card > .meta { gap: 5px; font-size: 10px; }
+  #jobResults .job-grid.is-grid-view > .job-card > .job-description { font-size: 11px; line-height: 1.45; }
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom { flex-direction: column; align-items: stretch; gap: 7px; }
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom > .price { font-size: 15px; text-align: left; }
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom > .btn { width: 100%; padding-inline: 7px; font-size: 10px; }
+  #jobResults .job-grid.is-grid-view > .job-card > .posted { font-size: 9px; }
+
+  #jobResults .job-grid.is-list-view > .job-card {
+    position: relative;
+    grid-template-columns: minmax(0, 1fr) minmax(94px, 112px);
+    grid-template-areas:
+      "top actions"
+      "title actions"
+      "meta meta"
+      "description description";
+    gap: 7px 10px;
+    padding: 14px;
+  }
+
+  #jobResults .job-grid.is-list-view > .job-card > .card-top > .save-btn {
+    top: 14px;
+    right: 14px;
+  }
+
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom { grid-area: actions; display: flex !important; flex-direction: column; align-items: stretch; align-self: center; gap: 7px; }
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price { font-size: 15px; text-align: center; }
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price.price-fixed { font-size: 15px; white-space: normal; }
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .btn { width: 100%; min-height: 44px; padding: 8px 6px; font-size: 10px; }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    padding: 12px;
+    text-align: left;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .market-avatar {
+    --avatar-size: 38px !important;
+    flex-basis: 38px !important;
+    align-self: flex-start;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > h3 {
+    margin: 0;
+    padding: 0;
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > p:first-of-type {
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-offer {
+    margin: 4px 0 0;
+    padding: 8px;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-offer strong {
+    font-size: 13px;
+    line-height: 1.4;
+    -webkit-line-clamp: 2;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .skills { display: none !important; }
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > p:nth-of-type(2) {
+    display: -webkit-box !important;
+    max-height: 2.9em;
+    margin: 0;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    margin: 2px 0 0;
+    padding: 7px 5px;
+    font-size: 8px;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-stats strong { font-size: 11px; }
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .btn { width: 100%; margin: 2px 0 0 !important; padding: 8px 6px; font-size: 10px; }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused {
+    grid-template-columns: 42px minmax(0, 1fr);
+    grid-template-areas:
+      "avatar name"
+      "avatar location"
+      "avatar rating"
+      "offer offer"
+      "skills skills"
+      "about about"
+      "stats stats"
+      "button button";
+    column-gap: 9px;
+    row-gap: 6px;
+    padding: 14px;
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > h3 {
+    padding-right: 94px;
+    font-size: 14px;
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer {
+    margin: 7px 0 2px;
+    padding: 10px 12px;
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer strong {
+    font-size: 15px;
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats {
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-self: stretch;
+    gap: 5px;
+    margin: 3px 0 0;
+    padding: 9px 7px;
+    font-size: 10px;
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats strong { font-size: 13px; }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .btn {
+    width: 100%;
+    margin-top: 2px !important;
+  }
+
+  .listing-pagination {
+    margin-top: 19px;
+    gap: 7px;
+  }
+
+  .listing-pagination-actions {
+    gap: 5px;
+  }
+
+  .listing-page-button {
+    min-width: 40px;
+    height: 42px;
+    padding: 0 9px;
+  }
+
+.listing-page-step span {
+    display: none;
+  }
+}
+
+@media(min-width:761px){
+  #workerResults.is-list-view>.worker-card.worker-offer-focused{row-gap:3px;padding:14px 18px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused{grid-template-columns:54px minmax(0,1fr) minmax(290px,310px)}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-offer{margin:3px 0 0;padding:9px 13px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-offer strong{font-size:16px;line-height:1.35;-webkit-line-clamp:2}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.skills{gap:6px;margin:0}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-stats{grid-template-columns:minmax(92px,1fr) minmax(70px,.9fr) minmax(100px,1.1fr);margin:0;padding:8px 8px;gap:5px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-stats>span:first-child{white-space:nowrap}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>p:nth-of-type(2){margin:0;line-height:1.45}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.btn{min-height:40px;margin:0!important}
+}
+@media(max-width:760px){
+  #workerResults.is-list-view>.worker-card.worker-offer-focused{row-gap:4px;padding:12px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-offer{margin:4px 0 0;padding:8px 10px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.skills{gap:6px;margin:0}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-stats{margin:0;padding:7px 6px}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.worker-stats:not(.worker-stats-no-experience)>span:first-child{white-space:nowrap}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>p:nth-of-type(2){margin:0;line-height:1.45}
+  #workerResults.is-list-view>.worker-card.worker-offer-focused>.btn{margin:0!important}
+}
+
+/* Keep worker compensation labels readable in the compact list card stats. */
+@media (min-width: 761px) {
+  #workerResults.is-list-view > .worker-card.worker-offer-focused {
+    grid-template-columns: 54px minmax(0, 1fr) minmax(340px, 360px);
+  }
+
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats {
+    grid-template-columns: minmax(92px, .9fr) minmax(118px, 1.1fr) minmax(112px, 1fr);
+    column-gap: 9px;
+  }
+}
+
+#workerResults > .worker-card.worker-offer-focused > .worker-stats > span {
+  min-width: 0;
+  line-height: 1.4;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+#workerResults > .worker-card.worker-offer-focused > .worker-stats .worker-stat-label {
+  display: block;
+  margin-top: 3px;
+  color: var(--text-secondary);
+  font-size: 10px;
+  line-height: 1.35;
+  white-space: normal;
+  overflow-wrap: normal;
+  word-break: normal;
+}
+
+@media (max-width: 760px) {
+  #workerResults > .worker-card.worker-offer-focused > .worker-stats .worker-stat-label {
+    font-size: 9px;
+  }
+}
+
+/* Hide publication and view metadata from announcement cards, including the home feed. */
+.job-card > .posted,
+#latest-jobs .job-card > .posted {
+  display: none !important;
+}
+
+/* A profile without experience needs only two compact stat columns. */
+#workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats.worker-stats-no-experience {
+  grid-template-columns: repeat(2, minmax(104px, 1fr));
+  width: max-content;
+  max-width: 100%;
+  justify-self: end;
+  column-gap: 10px;
+}
+
+@media (max-width: 760px) {
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-stats.worker-stats-no-experience {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    width: min(100%, 280px);
+  }
+}
+
+/* Keep the selected pay type and its clear control inside the sort field. */
+.listing-sort-control.has-payment-type {
+  flex: 0 0 245px;
+  width: 245px;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-trigger {
+  width: 100%;
+  min-width: 0;
+  height: 48px;
+  padding-right: 58px;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-trigger > span {
+  display: flex;
+  min-width: 0;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: center;
+  gap: 1px;
+  line-height: 1.2;
+  white-space: normal;
+  text-align: left;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-type {
+  display: block;
+  max-width: 100%;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-clear {
+  right: 34px;
+}
+
+@media (max-width: 620px) {
+  .listing-sort-control.has-payment-type {
+    flex: 1 1 auto;
+    width: auto;
+  }
+}
+
+/* Balance the sort label across the available trigger width on both search pages. */
+.listing-sort-trigger > span {
+  flex: 1 1 auto;
+  min-width: 0;
+  justify-content: center;
+  text-align: center;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-trigger > span {
+  align-items: center;
+}
+
+/* Keep the selected option naturally aligned and comfortably inside its field. */
+.listing-sort-trigger > span {
+  justify-content: flex-start;
+  text-align: left;
+}
+
+.listing-sort-control.has-payment-type .listing-sort-trigger > span {
+  align-items: flex-start;
+}
+
+/* Pagination must hide cards after item 12 in both grid and list layouts. */
+#jobResults .job-grid.is-list-view > .job-card[hidden],
+#jobResults .job-grid.is-grid-view > .job-card[hidden],
+#workerResults.is-list-view > .worker-card[hidden],
+#workerResults.is-grid-view > .worker-card[hidden] {
+  display: none !important;
+}
+
+/* Mobile list cards keep the save action separate from price and details. */
+@media (max-width: 620px) {
+  #jobResults .job-grid.is-list-view > .job-card {
+    grid-template-columns: minmax(0, 1fr) !important;
+    grid-template-areas:
+      "top"
+      "title"
+      "meta"
+      "description"
+      "actions" !important;
+    align-items: start;
+    gap: 8px;
+    padding: 14px;
+  }
+
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom {
+    grid-area: actions;
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin: 4px 0 0;
+  }
+
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price,
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .price.price-fixed {
+    flex: 1 1 auto;
+    min-width: 0;
+    font-size: 15px;
+    line-height: 1.3;
+    text-align: left;
+  }
+
+  #jobResults .job-grid.is-list-view > .job-card > .card-bottom > .btn {
+    flex: 0 1 44%;
+    width: auto;
+    min-width: 112px;
+    max-width: 150px;
+    min-height: 42px;
+    padding: 8px;
+    font-size: 11px;
+  }
+}
+
+/* Keep home-feed seeker titles compact and fitted to their text on mobile. */
+@media (max-width: 620px) {
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    align-self: flex-start;
+    width: fit-content;
+    max-width: 100%;
+    margin: 0 0 4px;
+    padding: 5px 7px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer strong {
+    font-size: 9px;
+    line-height: 1.25;
+    -webkit-line-clamp: 2;
+    overflow-wrap: normal;
+    word-break: normal;
+  }
+}
+
+/* Home feed cards use the full phone width so their content stays readable. */
+@media (max-width: 620px) {
+  #latest-jobs .job-grid {
+    display: flex !important;
+    flex-flow: row nowrap;
+    align-items: stretch;
+    gap: 12px;
+    overflow-x: auto;
+    overscroll-behavior-x: contain;
+    scroll-snap-type: x mandatory;
+    scrollbar-width: none;
+    padding-bottom: 4px;
+  }
+
+  #latest-jobs .job-grid::-webkit-scrollbar {
+    display: none;
+  }
+
+  #latest-jobs .job-grid > .job-card,
+  #latest-jobs .job-grid > .worker-card {
+    flex: 0 0 calc((100% - 12px) / 2);
+    width: calc((100% - 12px) / 2);
+    min-width: 0;
+    min-height: 0 !important;
+    height: auto !important;
+    max-height: none !important;
+    padding: 10px !important;
+    overflow: visible;
+    border-radius: 15px;
+    scroll-snap-align: start;
+  }
+
+  #latest-jobs .job-grid > .job-card {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top {
+    display: flex;
+    min-height: 38px;
+    align-items: center;
+    justify-content: space-between;
+    gap: 8px;
+    margin: 0 0 10px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top > .pill,
+  #latest-jobs .job-grid > .job-card > .card-top > .home-listing-type {
+    display: inline-flex !important;
+    max-width: calc(100% - 48px);
+    min-height: 26px;
+    align-items: center;
+    padding: 5px 10px;
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top > .save-btn {
+    flex: 0 0 38px;
+    width: 38px !important;
+    min-width: 38px !important;
+    height: 38px;
+    min-height: 38px;
+  }
+
+  #latest-jobs .job-grid > .job-card > h3 {
+    display: -webkit-box;
+    min-height: 0;
+    max-height: 2.8em;
+    margin: 0 0 8px;
+    overflow: hidden;
+    font-size: 18px;
+    line-height: 1.4;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .job-card > .meta,
+  #latest-jobs .job-grid > .job-card > .schedule-card-meta {
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px 12px;
+    margin: 0 0 10px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  #latest-jobs .job-grid > .job-card > .job-description {
+    display: -webkit-box !important;
+    flex: 0 0 auto;
+    min-height: calc(2.9em + 8px);
+    max-height: none;
+    height: auto;
+    margin: 0 0 12px;
+    padding-bottom: 8px;
+    border-bottom: 1px solid var(--border);
+    overflow: hidden;
+    font-size: 11px;
+    line-height: 1.45;
+    white-space: pre-line;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2 !important;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom {
+    display: flex !important;
+    flex-direction: row;
+    align-items: center;
+    justify-content: space-between;
+    gap: 10px;
+    width: 100%;
+    margin: 0 !important;
+    padding: 12px 0 0;
+    border-top: 1px solid var(--border);
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .price {
+    min-width: 0;
+    font-size: 18px;
+    line-height: 1.35;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .price small {
+    display: inline;
+    font-size: 12px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 120px;
+    min-height: 42px;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  #latest-jobs .job-grid > .job-card > .posted {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card {
+    position: relative;
+    display: grid !important;
+    grid-template-columns: 52px minmax(0, 1fr);
+    grid-template-areas:
+      "type type"
+      "avatar name"
+      "avatar location"
+      "offer offer"
+      "skills skills"
+      "about about"
+      "stats stats"
+      "button button";
+    align-items: center;
+    column-gap: 12px;
+    row-gap: 0;
+    text-align: left;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .home-listing-card-top {
+    grid-area: type;
+    display: flex !important;
+    min-height: 30px;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0 52px 10px 0;
+    padding: 0;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .home-listing-card-top > .home-listing-type {
+    max-width: 100%;
+    min-height: 25px;
+    padding: 4px 10px;
+    font-size: 11px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .profile-save-button {
+    top: 14px;
+    right: 14px;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .profile-save-button .profile-save-label {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .market-avatar {
+    grid-area: avatar;
+    display: block !important;
+    justify-self: start;
+    width: 50px !important;
+    height: 50px !important;
+    margin: 0 !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > h3 {
+    grid-area: name;
+    display: block !important;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    padding-right: 38px;
+    overflow: visible;
+    font-size: 17px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .worker-card > p:first-of-type {
+    grid-area: location;
+    display: block !important;
+    margin: 3px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    grid-area: offer;
+    display: block !important;
+    width: 100%;
+    max-width: 100%;
+    margin: 14px 0 10px;
+    padding: 11px 13px;
+    border-radius: 11px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer strong {
+    display: -webkit-box;
+    font-size: 16px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .skills {
+    grid-area: skills;
+    display: flex !important;
+    flex-wrap: wrap;
+    gap: 6px;
+    max-height: none;
+    margin: 0 0 8px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .skills > .skill-overflow {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .skills > .skill {
+    max-width: 100%;
+    padding: 5px 8px;
+    font-size: 11px;
+    line-height: 1.3;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .rating-inline,
+  #latest-jobs .job-grid > .worker-card > .listing-view-count {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > p:nth-of-type(2) {
+    grid-area: about;
+    display: -webkit-box !important;
+    max-height: 4.65em;
+    margin: 0 0 4px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.55;
+    text-align: left;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats {
+    grid-area: stats;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    margin: 10px 0 0;
+    padding: 10px;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats-no-experience,
+  #latest-jobs .job-grid > .worker-card > .worker-stats-negotiable {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  #latest-jobs .job-grid > .worker-card .worker-stat-label {
+    display: block;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .btn {
+    grid-area: button;
+    width: 100%;
+    min-height: 44px;
+    margin: 10px 0 0 !important;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top {
+    min-height: 30px;
+    gap: 4px;
+    margin-bottom: 7px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top > .pill,
+  #latest-jobs .job-grid > .job-card > .card-top > .home-listing-type {
+    max-width: calc(100% - 34px);
+    min-height: 22px;
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-top > .save-btn {
+    flex-basis: 30px;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px;
+    min-height: 30px;
+  }
+
+  #latest-jobs .job-grid > .job-card > h3 {
+    margin-bottom: 6px;
+    font-size: 14px;
+    line-height: 1.35;
+  }
+
+  #latest-jobs .job-grid > .job-card > .meta,
+  #latest-jobs .job-grid > .job-card > .schedule-card-meta {
+    gap: 4px;
+    margin-bottom: 7px;
+    font-size: 10px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .job-description {
+    min-height: calc(2.9em + 8px);
+    max-height: none;
+    margin-bottom: 12px;
+    font-size: 11px;
+    line-height: 1.45;
+    -webkit-line-clamp: 2 !important;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom {
+    flex-direction: column;
+    align-items: stretch;
+    gap: 7px;
+    padding-top: 8px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .price {
+    font-size: 15px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .price small {
+    font-size: 10px;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom > .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 38px;
+    padding: 6px;
+    font-size: 10px;
+  }
+
+  #latest-jobs .job-grid > .worker-card {
+    grid-template-columns: 36px minmax(0, 1fr);
+    column-gap: 7px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .home-listing-card-top {
+    min-height: 25px;
+    margin-right: 35px;
+    margin-bottom: 7px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .home-listing-card-top > .home-listing-type {
+    min-height: 21px;
+    padding: 3px 6px;
+    font-size: 9px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .profile-save-button {
+    top: 9px;
+    right: 9px;
+    width: 30px !important;
+    min-width: 30px !important;
+    height: 30px;
+    min-height: 30px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .market-avatar {
+    width: 36px !important;
+    height: 36px !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > h3 {
+    padding-right: 0;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  #latest-jobs .job-grid > .worker-card > p:first-of-type {
+    font-size: 10px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    margin: 10px 0 7px;
+    padding: 8px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer strong {
+    font-size: 12px;
+    line-height: 1.35;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .skills {
+    gap: 4px;
+    margin-bottom: 6px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .skills > .skill {
+    padding: 4px 5px;
+    font-size: 9px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > p:nth-of-type(2) {
+    max-height: 2.9em;
+    margin-bottom: 2px;
+    font-size: 10px;
+    line-height: 1.45;
+    -webkit-line-clamp: 2;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 5px;
+    margin-top: 7px;
+    padding: 7px 5px;
+    font-size: 8px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats strong {
+    font-size: 11px;
+  }
+
+  #latest-jobs .job-grid > .worker-card .worker-stat-label {
+    font-size: 8px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .btn {
+    min-height: 38px;
+    margin-top: 7px !important;
+    padding: 6px;
+    font-size: 10px;
+  }
+
+  #latest-jobs .job-grid > .worker-card {
+    align-self: stretch;
+    height: auto !important;
+    min-height: 205px !important;
+    grid-template-columns: minmax(0, 1fr);
+    grid-template-areas:
+      "type"
+      "name"
+      "location"
+      "offer"
+      "skills"
+      "about"
+      "stats"
+      "button";
+  }
+
+  #latest-jobs .job-grid > .worker-card > .market-avatar {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+    gap: 6px;
+    padding: 8px 7px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats > span {
+    width: 100%;
+    text-align: center;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats strong {
+    font-size: 12px;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  #latest-jobs .job-grid > .worker-card .worker-stat-label {
+    font-size: 9px;
+    line-height: 1.35;
+    overflow-wrap: normal;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats > .worker-availability-stat {
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats {
+    grid-template-columns: minmax(0, 1fr) !important;
+    min-height: 44px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > h3 {
+    display: -webkit-box !important;
+    height: 2.6em;
+    min-height: 2.6em;
+    max-height: 2.6em;
+    overflow: hidden;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    display: flex !important;
+    height: 48px;
+    min-height: 48px;
+    max-height: 48px;
+    align-items: center;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer strong {
+    max-height: 2.7em;
+    overflow: hidden;
+    -webkit-line-clamp: 2;
+  }
+
+  #latest-jobs .job-grid > .worker-card > p:nth-of-type(2) {
+    min-height: 2.9em;
+    max-height: 2.9em;
+    -webkit-line-clamp: 2;
+    display: none !important;
+  }
+
+  #latest-jobs .job-grid > .job-card {
+    align-self: stretch;
+    min-height: 205px !important;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom {
+    margin-top: auto !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card {
+    grid-template-rows: 25px auto 1.4em auto auto 0 auto 38px;
+  }
+
+  #latest-jobs .job-grid > .worker-card > h3 {
+    height: auto;
+    min-height: 0;
+    max-height: 2.6em;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    height: auto;
+    min-height: 50px;
+    max-height: none;
+  }
+
+  #latest-jobs .job-grid > .job-card > .job-description {
+    min-height: 2.9em !important;
+    max-height: 2.9em !important;
+    margin: 0 0 5px !important;
+    padding: 0 0 5px !important;
+    border: 0 !important;
+    border-bottom: 1px solid var(--border) !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  #latest-jobs .job-grid > .job-card > .card-bottom {
+    margin-top: 0 !important;
+    padding-top: 0 !important;
+    border: 0 !important;
+    background: none !important;
+    box-shadow: none !important;
+  }
+
+  #latest-jobs .job-grid > .job-card {
+    align-self: start !important;
+    height: auto !important;
+    min-height: 0 !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-offer {
+    margin-bottom: 6px !important;
+  }
+
+  #latest-jobs .job-grid > .worker-card > .worker-stats {
+    margin-top: 4px !important;
+  }
+}
+
+@media (max-width: 620px) {
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused {
+    display: grid !important;
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "avatar name"
+      "location location"
+      "offer offer"
+      "skills skills"
+      "about about"
+      "stats stats"
+      "views views"
+      "button button" !important;
+    align-items: center;
+    column-gap: 6px;
+    row-gap: 4px;
+    padding: 9px 7px;
+    text-align: left;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .market-avatar,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .market-avatar {
+    grid-area: avatar !important;
+    display: block !important;
+    width: 30px !important;
+    height: 30px !important;
+    margin: 0 !important;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > h3,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > h3 {
+    grid-area: name !important;
+    min-width: 0;
+    max-height: 2.6em;
+    margin: 0 !important;
+    padding-right: 24px !important;
+    overflow: hidden;
+    font-size: 10px !important;
+    line-height: 1.3;
+    text-align: left;
+    overflow-wrap: anywhere;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > p:first-of-type,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > p:first-of-type {
+    grid-area: location !important;
+    margin: 0 !important;
+    font-size: 8px;
+    line-height: 1.3;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .worker-offer,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .worker-offer {
+    grid-area: offer !important;
+    margin: 2px 0 0 !important;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > .rating-inline,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > .rating-inline {
+    display: none !important;
+  }
+}
+
+/* iPhone SE width: keep the save action fixed at the card's top-right. */
+@media (max-width: 380px) {
+  #jobResults .job-card > .card-top {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 5px;
+    min-height: 30px;
+    margin: 0 0 8px;
+    padding-right: 34px;
+  }
+
+  #jobResults .job-card > .card-top > .pill {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn.saved-action {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid !important;
+    flex: 0 0 28px !important;
+    place-items: center;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn .save-label {
+    display: none !important;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn .save-heart {
+    font-size: 17px;
+    line-height: 1;
+  }
+}
+
+/* iPhone SE width: compact the save control on people cards as well. */
+@media (max-width: 380px) {
+  #app .worker-card > .profile-save-button.profile-save-header {
+    top: 6px;
+    right: 6px;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: 9px !important;
+  }
+
+  #app .worker-card > .profile-save-button .profile-save-label {
+    display: none !important;
+  }
+
+  #app .worker-card > .profile-save-button .day-icon {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+/* iPhone SE width: compact the public profile header without affecting larger phones. */
+@media (max-width: 380px) {
+  #app .worker-profile-heading.profile-save-anchor {
+    align-items: center;
+    gap: 10px;
+    padding-right: 86px !important;
+  }
+
+  #app .worker-profile-heading > .market-avatar {
+    --avatar-size: 54px !important;
+    flex: 0 0 54px !important;
+    width: 54px !important;
+    height: 54px !important;
+  }
+
+  #app .worker-profile-heading > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  #app .worker-profile-heading h1 {
+    margin: 0 0 5px;
+    overflow: hidden;
+    font-size: 16px !important;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
+  #app .worker-profile-heading .meta {
+    display: block;
+    overflow: hidden;
+    font-size: 11px !important;
+    line-height: 1.35;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+
+  #app .worker-profile-heading > .profile-save-button.profile-save-header {
+    top: -12px;
+    right: -2px;
+    width: 78px !important;
+    min-width: 78px !important;
+    height: 30px !important;
+    min-height: 30px !important;
+    padding: 0 5px !important;
+    gap: 4px !important;
+    border-radius: 9px !important;
+    font-size: 10px !important;
+  }
+
+  #app .worker-profile-heading > .profile-save-button .profile-save-label {
+    display: inline !important;
+    font-size: 10px !important;
+  }
+
+  #app .worker-profile-heading > .profile-save-button .day-icon {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+/* 360px mobile viewport: reserve a fixed icon-only slot for the theme switch. */
+@media (max-width: 360px) {
+  .header > .theme-toggle {
+    flex: 0 0 42px;
+    width: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+  }
+
+  .header > .theme-toggle .theme-label-light,
+  .header > .theme-toggle .theme-label-dark {
+    display: none !important;
+  }
+}
+
+/* 360px mobile viewport: keep the profile-report action readable above the metadata. */
+@media (max-width: 360px) {
+  #app .detail-main-footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 6px 8px;
+  }
+
+  #app .detail-main-footer > .report-link {
+    flex: 1 0 100%;
+    min-width: 0;
+    margin: 0;
+    font-size: 10px;
+    line-height: 1.3;
+    white-space: nowrap;
+  }
+
+  #app .detail-main-footer > .detail-publication-meta {
+    flex: 1 0 100%;
+    justify-content: space-between;
+    gap: 8px;
+  }
+}
+
+/* iPhone 16 width: keep save controls clear of long category pills. */
+@media (width: 393px) {
+  #jobResults .job-card > .card-top {
+    position: relative;
+    display: flex;
+    flex-wrap: wrap;
+    justify-content: flex-start;
+    align-items: flex-start;
+    gap: 5px;
+    min-height: 30px;
+    margin: 0 0 8px;
+    padding-right: 34px;
+  }
+
+  #jobResults .job-card > .card-top > .pill {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn.saved-action {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: grid !important;
+    flex: 0 0 28px !important;
+    place-items: center;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    font-size: 0 !important;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn .save-label {
+    display: none !important;
+  }
+
+  #jobResults .job-card > .card-top > .save-btn .save-heart {
+    font-size: 17px;
+    line-height: 1;
+  }
+
+  #app .worker-card > .profile-save-button.profile-save-header {
+    top: 6px;
+    right: 6px;
+    width: 28px !important;
+    min-width: 28px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 !important;
+    gap: 0 !important;
+    border-radius: 9px !important;
+  }
+
+  #app .worker-card > .profile-save-button .profile-save-label {
+    display: none !important;
+  }
+
+  #app .worker-card > .profile-save-button .day-icon {
+    width: 15px;
+    height: 15px;
+  }
+}
+
+@media (max-width: 767px) {
+  #app .report-link-icon {
+    display: none !important;
+  }
+}
+
+@media (max-width: 767px) {
+  #app {
+    min-width: 0;
+    width: 100%;
+    max-width: 100vw;
+  }
+
+  .header {
+    position: sticky !important;
+    top: 0 !important;
+    z-index: 1000 !important;
+    width: 100%;
+    max-width: 100vw;
+    margin: 0;
+    background: var(--surface) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+}
+
+@media (max-width: 480px) {
+  .header {
+    gap: 4px;
+    padding-inline: 12px !important;
+    justify-content: flex-start;
+  }
+
+  .header > .brand {
+    flex: 0 1 auto;
+    min-width: 0;
+    padding-inline: 6px !important;
+    font-size: 20px !important;
+  }
+
+  .header > .theme-toggle {
+    flex: 0 0 42px !important;
+    width: 42px !important;
+    min-width: 42px !important;
+    padding: 0 !important;
+  }
+
+  .header > .theme-toggle .theme-label-light,
+  .header > .theme-toggle .theme-label-dark {
+    display: none !important;
+  }
+
+  .header > .menu-toggle {
+    flex: 0 0 34px;
+    width: 34px !important;
+    min-width: 34px !important;
+  }
+
+  .header > #mobileAccountSlot.has-account {
+    flex: 0 0 36px;
+    width: 36px;
+    min-width: 36px;
+  }
+
+  #mobileAccountSlot .account-nav {
+    width: 36px;
+    min-width: 0;
+    padding: 0;
+    border: 0;
+  }
+
+  #mobileAccountSlot .account-nav-trigger {
+    display: grid;
+    place-items: center;
+    width: 36px;
+    min-width: 36px;
+    height: 36px;
+    padding: 0 !important;
+  }
+
+  #mobileAccountSlot .account-name,
+  #mobileAccountSlot .account-nav-trigger > .day-icon {
+    display: none !important;
+  }
+
+  #mobileAccountSlot .day-avatar {
+    width: 30px;
+    height: 30px;
+  }
+
+  .header > .header-cta {
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    margin-left: 0 !important;
+    padding-inline: 3px !important;
+  }
+
+  .header > .header-cta .header-cta-label {
+    font-size: 8px !important;
+  }
+
+  .hero-wrap {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    margin-inline: auto;
+    padding-inline: 16px !important;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-wrap > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-copy,
+  .hero-actions,
+  .hero-actions > .btn {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .hero-copy,
+  .hero-actions {
+    width: 100%;
+  }
+
+  .hero-actions {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .hero-actions > .btn {
+    width: 100%;
+    padding-inline: 10px;
+  }
+
+  .hero-visual,
+  .hero-art,
+  .handshake-art {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .intent-dock {
+    left: 0;
+    right: 0;
+    width: 100%;
+    box-sizing: border-box;
+  }
+
+  .intent-dock > a {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  #mobileAccountSlot .account-nav-trigger {
+    width: 34px !important;
+    min-width: 34px !important;
+    height: 34px !important;
+    min-height: 34px !important;
+    aspect-ratio: 1 / 1;
+    padding: 2px !important;
+    border-radius: 50% !important;
+    background: transparent !important;
+    box-shadow: none !important;
+  }
+
+  #mobileAccountSlot .day-avatar {
+    display: block;
+    flex: 0 0 28px;
+    width: 28px !important;
+    height: 28px !important;
+    min-width: 28px;
+    aspect-ratio: 1 / 1;
+    overflow: hidden;
+    border-radius: 50% !important;
+    box-shadow: none !important;
+  }
+
+  #mobileAccountSlot .day-avatar > img,
+  #mobileAccountSlot .day-avatar > svg {
+    display: block;
+    width: 100%;
+    height: 100%;
+    border-radius: 50%;
+    object-fit: cover;
+  }
+}
+
+
+@media (width: 393px) {
+  .header {
+    gap: 4px;
+  }
+
+  .header > .theme-toggle {
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .header > .theme-toggle .theme-label-light,
+  .header > .theme-toggle .theme-label-dark {
+    display: none !important;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 380px) {
+  .header {
+    gap: 4px;
+    padding-right: 12px !important;
+    position: sticky;
+    top: 0;
+    z-index: 100;
+    background: var(--surface) !important;
+    -webkit-backdrop-filter: none;
+    backdrop-filter: none;
+  }
+
+  .header > .brand {
+    font-size: 21px !important;
+    padding-inline: 6px !important;
+  }
+
+  .header > .theme-toggle {
+    flex: 0 0 42px;
+    width: 42px;
+    min-width: 42px;
+    padding: 0;
+    justify-content: center;
+  }
+
+  .header > .theme-toggle .theme-label-light,
+  .header > .theme-toggle .theme-label-dark {
+    display: none !important;
+  }
+
+  .header > .header-cta {
+    flex: 0 0 72px !important;
+    width: 72px !important;
+    min-width: 72px !important;
+    max-width: 72px !important;
+    padding-inline: 3px !important;
+  }
+
+  .header > .header-cta .header-cta-label {
+    font-size: 8px !important;
+  }
+}
+
+@media (min-width: 361px) and (max-width: 380px) {
+  #app .detail-main-footer {
+    gap: 6px;
+  }
+
+  #app .detail-main-footer > .report-link {
+    flex: 0 0 auto;
+    font-size: 9px;
+    line-height: 1.25;
+    white-space: nowrap;
+  }
+
+  #app .detail-main-footer > .detail-publication-meta {
+    gap: 6px;
+  }
+
+  #app .detail-main-footer .listing-view-count,
+  #app .detail-main-footer .detail-published-at {
+    font-size: 9px;
+  }
+}
+
+/* iPhone 16 width: fit the profile identity and address on compact horizontal rows. */
+@media (width: 393px) {
+  #app .worker-profile-heading.profile-save-anchor {
+    align-items: center;
+    gap: 10px;
+    padding-right: 86px !important;
+  }
+
+  #app .worker-profile-heading > .market-avatar {
+    --avatar-size: 58px !important;
+    flex: 0 0 58px !important;
+    width: 58px !important;
+    height: 58px !important;
+  }
+
+  #app .worker-profile-heading > div {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  #app .worker-profile-heading h1 {
+    margin: 0 0 5px;
+    overflow: hidden;
+    font-size: 18px !important;
+    line-height: 1.25;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+    overflow-wrap: normal;
+  }
+
+  #app .worker-profile-heading .meta {
+    display: block;
+    overflow: hidden;
+    font-size: 12px !important;
+    line-height: 1.4;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+@media (width: 393px) {
+  #app .detail-main-footer {
+    justify-content: flex-start;
+    gap: 8px;
+  }
+
+  #app .detail-main-footer > .report-link {
+    flex: 0 0 auto;
+  }
+
+  #app .worker-profile-heading > .profile-save-button.profile-save-header {
+    top: -4px;
+    right: 6px;
+    width: 70px !important;
+    min-width: 70px !important;
+    height: 28px !important;
+    min-height: 28px !important;
+    padding: 0 4px !important;
+    gap: 3px !important;
+    border-radius: 8px !important;
+    font-size: 9px !important;
+  }
+
+  #app .worker-profile-heading > .profile-save-button .day-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  #app .worker-profile-heading > .profile-save-button .profile-save-label {
+    font-size: 9px !important;
+  }
+}
+
+@media (max-width: 767px) {
+  html,
+  body,
+  #app {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+  }
+
+  #app .container,
+  #app .hero-wrap {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    box-sizing: border-box !important;
+    margin-inline: auto;
+    padding-inline: clamp(14px, 4vw, 18px) !important;
+  }
+
+  #app > .hero {
+    width: 100% !important;
+    max-width: 100% !important;
+    min-width: 0;
+    padding-inline: 0 !important;
+    overflow: visible;
+    box-sizing: border-box !important;
+  }
+
+  #app .hero-wrap {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 29px;
+  }
+
+  #app .container > *,
+  #app .hero-wrap > * {
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box !important;
+  }
+
+  #app .hero-copy,
+  #app .hero-copy > h1,
+  #app .hero-copy > p {
+    min-width: 0;
+    max-width: 100%;
+    overflow-wrap: anywhere;
+  }
+
+  #app .hero .trust-row {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    flex-wrap: wrap;
+  }
+
+  #app .hero .trust-row > span {
+    min-width: 0;
+    max-width: 100%;
+    white-space: normal;
+    overflow-wrap: anywhere;
+  }
+
+  #app .hero-actions {
+    display: grid;
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  #app .hero-actions > .btn {
+    width: 100%;
+    min-width: 0;
+    max-width: 100%;
+    box-sizing: border-box !important;
+    padding-inline: 10px;
+  }
+
+  #app .hero-visual,
+  #app .hero-art,
+  #app .handshake-art {
+    width: 100% !important;
+    min-width: 0;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #app .hero-visual.thumbs-visual {
+    width: min(100%, 510px) !important;
+    justify-self: center;
+  }
+
+  #app .hero-visual img,
+  #app .hero-visual video,
+  #app .hero-visual svg {
+    width: 100%;
+    max-width: 100% !important;
+    box-sizing: border-box !important;
+  }
+
+  #app .job-grid > *,
+  #app .worker-grid > *,
+  #app .categories > *,
+  #app .filter-panel > *,
+  #app .schedule-filter-panel > *,
+  #app .detail-layout > *,
+  #app .dashboard > * {
+    min-width: 0;
+    max-width: 100%;
+  }
+
+  .header {
+    width: 100%;
+    max-width: 100%;
+    min-width: 0;
+    box-sizing: border-box;
+    padding-inline: clamp(10px, 3.2vw, 16px) !important;
+    gap: clamp(2px, 1vw, 4px) !important;
+    justify-content: space-between;
+    flex-wrap: nowrap;
+  }
+
+  .header > .brand {
+    flex: 1 1 0%;
+    min-width: 0;
+    max-width: 40vw;
+    padding-inline: clamp(4px, 1.6vw, 7px) !important;
+    font-size: clamp(17px, 5.3vw, 21px) !important;
+    white-space: nowrap;
+  }
+
+  .header > .theme-toggle {
+    flex: 0 0 40px !important;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    margin-inline: 0 !important;
+  }
+
+  .header > .menu-toggle {
+    flex: 0 0 32px;
+    width: 32px !important;
+    min-width: 32px !important;
+    max-width: 32px !important;
+    margin-inline: 0 !important;
+  }
+
+  .header > #mobileAccountSlot.has-account {
+    flex: 0 0 34px;
+    width: 34px;
+    min-width: 34px;
+    max-width: 34px;
+    margin-inline: 0 !important;
+  }
+
+  #mobileAccountSlot .account-nav,
+  #mobileAccountSlot .account-nav-trigger {
+    width: 34px;
+    min-width: 34px;
+    height: 34px;
+    padding: 0 !important;
+  }
+
+  #mobileAccountSlot .day-avatar {
+    width: 28px;
+    height: 28px;
+  }
+
+  .header > .header-cta {
+    flex: 0 0 clamp(60px, 19vw, 72px) !important;
+    width: clamp(60px, 19vw, 72px) !important;
+    min-width: clamp(60px, 19vw, 72px) !important;
+    max-width: clamp(60px, 19vw, 72px) !important;
+    margin-left: 0 !important;
+    margin-right: 0 !important;
+    padding-inline: 3px !important;
+  }
+}
+
+/* Compact mobile job-result cards without clipping their text or actions. */
+@media (max-width: 620px) {
+  #jobResults .job-grid.is-grid-view > .job-card {
+    position: relative;
+    gap: 2px;
+    padding: 8px;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .card-top {
+    position: static;
+    gap: 0;
+    min-height: 0;
+    margin: 0;
+    padding-right: 0;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .card-top > .save-btn.saved-action {
+    position: absolute;
+    z-index: 2;
+    top: 8px;
+    right: 8px;
+    margin: 0;
+  }
+
+  #jobResults .job-search-results-grid.is-grid-view > .job-card > .card-top > .job-category-stack {
+    max-width: calc(100% - 38px);
+    gap: 2px;
+  }
+
+  #jobResults .job-search-results-grid.is-grid-view > .job-card > .card-top > .job-category-stack > .pill {
+    padding: 2px 6px;
+    font-size: 8px;
+    line-height: 1.2;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > h3 {
+    margin: 0 0 3px;
+    padding-right: 38px;
+    font-size: 13px;
+    line-height: 1.3;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .schedule-card-meta {
+    gap: 3px !important;
+    margin: 3px 0;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .schedule-card-meta > span:not(.job-location) {
+    padding: 3px 6px;
+    font-size: 9px;
+    line-height: 1.25;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .job-description {
+    min-height: 0;
+    margin: 4px 0;
+    font-size: 10px;
+    line-height: 1.4;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom {
+    gap: 4px;
+    margin: 2px 0 0;
+    padding-top: 6px;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom > .price {
+    font-size: 14px;
+    line-height: 1.25;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .card-bottom > .btn {
+    width: 100%;
+    min-height: 34px;
+    padding-block: 4px;
+    line-height: 1.2;
+  }
+
+  #jobResults .job-grid.is-grid-view > .job-card > .posted {
+    margin-top: 0;
+    padding-top: 5px;
+    font-size: 8px;
+  }
+}
+
+/* Place worker names beside their avatars in the mobile people-search cards. */
+@media (max-width: 620px) {
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused {
+    display: grid !important;
+    grid-template-columns: 30px minmax(0, 1fr) !important;
+    grid-template-areas:
+      "avatar name"
+      "location location"
+      "offer offer"
+      "skills skills"
+      "about about"
+      "stats stats"
+      "views views"
+      "button button" !important;
+    align-items: center;
+  }
+
+  #workerResults.is-grid-view > .worker-card.worker-offer-focused > h3,
+  #workerResults.is-list-view > .worker-card.worker-offer-focused > h3 {
+    grid-area: name !important;
+    grid-column: 2 !important;
+    grid-row: 1 !important;
+    align-self: center !important;
+    max-height: 1.3em;
+    margin: 0 !important;
+    padding-right: 24px !important;
+    overflow: hidden;
+    font-size: 10px !important;
+    line-height: 1.3;
+    text-align: left;
+    text-overflow: ellipsis;
+    white-space: nowrap;
+  }
+}
+
+
+/* Remove the confusing horizontal account menu from the mobile own-listings page. */
+@media (max-width: 620px) {
+  #app .dashboard > .own-posts-side-menu {
+    display: none !important;
+  }
+}
+
+
+/* Match the mobile menu button to the theme-toggle control size. */
+@media (max-width: 620px) {
+  .header > .menu-toggle {
+    display: grid;
+    flex: 0 0 40px !important;
+    place-items: center;
+    width: 40px !important;
+    min-width: 40px !important;
+    max-width: 40px !important;
+    height: 40px !important;
+    min-height: 40px !important;
+    max-height: 40px !important;
+    margin-inline: 0 !important;
+    padding: 0 !important;
+    box-sizing: border-box;
+  }
+
+  .header > .menu-toggle > .day-icon {
+    display: block;
+    margin: 0;
+  }
+}
+
+/* Keep the four homepage trust badges aligned as equal cards. */
+.hero .trust-row {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  grid-auto-rows: 44px;
+  gap: 9px 10px;
+  width: 100%;
+  max-width: 400px;
+  margin-top: 24px;
+}
+.hero .trust-row > span {
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+  width: 100%;
+  min-width: 0;
+  min-height: 44px;
+  height: 44px;
+  padding: 0 8px 0 22px;
+  text-align: center;
+  white-space: normal;
+  line-height: 1.2;
+  transition: transform .18s ease, border-color .18s ease, box-shadow .18s ease;
+}
+.hero .trust-row > span::before {
+  flex: 0 0 18px;
+  width: 18px;
+  height: 18px;
+  margin-right: 7px;
+}
+.hero .trust-row > span:hover {
+  transform: translateY(-1px);
+  border-color: #8fb49d;
+  box-shadow: 0 5px 14px rgba(23, 107, 81, .12);
+}
+@media (max-width: 380px) {
+  .hero .trust-row { gap: 8px; }
+  .hero .trust-row > span { padding-inline: 5px; font-size: clamp(9px, 3vw, 11px); }
+  .hero .trust-row > span::before { flex-basis: 16px; width: 16px; height: 16px; margin-right: 5px; }
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .trust-row > span { transition: none; }
+}
+/* Match the desktop hero actions to the equal-sized trust cards. */
+@media (min-width: 768px) {
+  .hero .hero-actions {
+    display: grid;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 10px;
+    width: 100%;
+    max-width: 400px;
+    margin-top: 24px;
+  }
+  .hero .hero-actions > .btn {
+    width: 100%;
+    height: 50px;
+    min-height: 50px;
+    padding: 0 8px;
+    box-sizing: border-box;
+    font-size: 16px;
+  }
+}
+/* Give the two homepage action icons a clear brand-green accent. */
+.hero .hero-actions > .btn .day-icon {
+  color: #176b51;
+  transition: color .18s ease;
+}
+html[data-theme="dark"] .hero .hero-actions > .btn .day-icon {
+  color: #75cf91;
+}
+.hero .hero-actions > .btn:hover .day-icon,
+.hero .hero-actions > .btn:focus-visible .day-icon,
+.hero .hero-actions > .btn:active .day-icon {
+  color: #d7f5e0;
+}
+@media (prefers-reduced-motion: reduce) {
+  .hero .hero-actions > .btn .day-icon { transition: none; }
+}
+/* Keep the two hero action buttons centered; badge alignment is separate. */
+.hero .hero-actions > .btn {
+  justify-content: center;
+}
+.hero .hero-actions > .btn .day-icon-wrap {
+  flex: 0 0 auto;
+}
+/* Center each action label and icon as a compact group. */
+.hero .hero-actions > .btn {
+  gap: 8px;
+  text-align: center;
+}
+.hero .hero-actions > .btn .day-icon-wrap {
+  margin-right: 0;
+}
+/* Nudge the seeker label upward in the desktop latest-listings cards only. */
+@media (min-width: 761px) {
+  #latest-jobs .worker-card > .home-listing-card-top > .home-listing-type--seeker {
+    transform: translateY(-5px);
+  }
+}

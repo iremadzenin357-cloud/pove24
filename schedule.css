@@ -1,0 +1,110 @@
+.schedule-filter-panel{display:flex;flex-direction:column;gap:16px;margin:18px 0 12px;padding:20px;background:#fff;border:1px solid #e8ece7;border-radius:18px;box-shadow:0 8px 28px rgba(31,57,40,.045)}
+.primary-filters,.advanced-filters{display:grid;grid-template-columns:repeat(4,minmax(0,1fr));gap:14px;align-items:end}
+.advanced-filters{grid-template-columns:repeat(4,minmax(0,1fr));padding-top:2px}
+.schedule-filter-panel .field{min-width:0}.schedule-filter-panel input,.schedule-filter-panel select,.form-shell input,.form-shell select{min-height:46px}
+.quick-date-field .quick-date-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:6px}.quick-date{border:1px solid #e1e7e0;background:#fff;color:#445347;border-radius:9px;padding:9px 11px;font:inherit;font-size:13px;cursor:pointer;white-space:nowrap}.quick-date:hover,.quick-date.selected{border-color:#367650;background:#edf6ef;color:#286541}
+.quick-date-picker{margin-top:8px;width:100%}.quick-date-picker[hidden]{display:none}
+.filter-actions{display:flex;align-items:center;gap:10px}.filter-actions .btn{min-height:44px}.more-filters{display:none}
+.active-filters{margin:0 0 15px}.chips-heading{display:flex;justify-content:space-between;gap:12px;align-items:center;margin-bottom:8px;color:#526056;font-size:14px}.chips-heading button{border:0;background:none;color:#367650;font:inherit;font-size:13px;cursor:pointer}.filter-chip-list{display:flex;gap:8px;flex-wrap:wrap}.filter-chip{border:1px solid #dce9df;background:#f3f8f4;color:#315c3d;padding:7px 10px;border-radius:999px;font:inherit;font-size:13px;cursor:pointer}.filter-chip span{padding-left:4px;font-size:16px}.filter-note{padding:10px 13px;border-radius:10px;background:#fff8e9;color:#785c25;font-size:13px}
+.schedule-card-meta{display:flex;flex-direction:column;gap:7px!important;align-items:flex-start!important;margin:12px 0}.schedule-card-meta span:first-child{color:#355f43;font-weight:600}.job-card .price{font-size:16px}.schedule-detail-meta{grid-template-columns:repeat(2,minmax(0,1fr))}.schedule-detail-meta strong{line-height:1.5}.post-date-options{display:flex;flex-wrap:wrap;gap:7px;margin-bottom:8px}.post-date-options button{border:1px solid #dce6dd;background:#f8faf7;color:#355b40;border-radius:8px;padding:8px 11px;font:inherit;font-size:13px;cursor:pointer}.post-date-options button:hover,.post-date-options button.selected{background:#ebf4ec;border-color:#75a682;color:#245c38}.post-end-date-field[hidden],.post-amount-field[hidden]{display:none}.field-hint{display:block;color:#78847a;font-size:12px;margin-top:6px}
+.worker-skills-field{min-width:0}.worker-skill-chips{display:flex;flex-wrap:wrap;gap:7px;margin:0 0 9px}.worker-skill-chips:empty{display:none}.worker-skill-chip{display:inline-flex;align-items:center;gap:7px;max-width:100%;padding:4px 6px 4px 11px;border:1px solid var(--border);border-radius:999px;background:var(--accent-soft);color:var(--text-primary);font-size:12px;line-height:1.5}.worker-skill-chip>span{min-width:0;overflow-wrap:anywhere}.worker-skill-chip button{display:grid;flex:none;width:27px;height:27px;place-items:center;padding:0;border:1px solid var(--border);border-radius:50%;background:var(--surface-elevated);color:var(--text-secondary);cursor:pointer;transition:background .16s,border-color .16s,color .16s}.worker-skill-chip button svg{width:14px;height:14px}.worker-skill-chip button:hover{border-color:#d59a91;background:#fbefed;color:#a4473e}.worker-skill-chip button:focus-visible{outline:3px solid var(--focus-ring);outline-offset:2px}.worker-skills-field>.category-picker{z-index:5}.worker-skills-error{margin-top:6px}
+html[data-theme="dark"] .worker-skill-chip{border-color:var(--border);background:#24382c;color:var(--text-primary)}html[data-theme="dark"] .worker-skill-chip button{border-color:#4b5c50;background:#1d2821;color:var(--text-secondary)}html[data-theme="dark"] .worker-skill-chip button:hover{border-color:#80534b;background:#3b2b28;color:#ffb2a7}
+@media(max-width:760px){.schedule-filter-panel{padding:15px;gap:13px}.primary-filters{grid-template-columns:1fr 1fr;gap:12px}.primary-filters .filter-city,.primary-filters .quick-date-field{grid-column:1/-1}.primary-filters .category-field,.primary-filters>.field:last-child{grid-column:span 1}.advanced-filters{display:none;grid-template-columns:1fr 1fr;gap:11px}.advanced-filters.expanded{display:grid}.more-filters{display:inline-flex}.filter-actions{justify-content:space-between}.quick-date-field .quick-date-options{display:grid;grid-template-columns:repeat(2,minmax(0,1fr))}.quick-date{padding:9px 5px;font-size:12px}.schedule-card-meta{font-size:13px}.schedule-detail-meta{grid-template-columns:1fr 1fr}.chips-heading{align-items:flex-start}}
+@media(max-width:430px){.primary-filters{grid-template-columns:1fr}.primary-filters .filter-city,.primary-filters .quick-date-field,.primary-filters .category-field,.primary-filters>.field:last-child{grid-column:1}.quick-date-field .quick-date-options{grid-template-columns:repeat(2,minmax(0,1fr))}.advanced-filters{grid-template-columns:1fr}.schedule-detail-meta{grid-template-columns:1fr}}
+html[data-theme="dark"] .post-date-options button.selected{border-color:#67a77c;background:#294334;color:#bcebc8}
+
+.worker-experience-duration-field[hidden]{display:none}
+.secondary-filters{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:14px;align-items:end;margin-top:14px}
+.secondary-filters>.filter-actions{width:100%;margin:0}
+.secondary-filters>.filter-actions .btn{width:100%;min-height:46px}
+@media(max-width:1000px){.secondary-filters{grid-template-columns:repeat(3,minmax(0,1fr))}}
+@media(max-width:760px){.secondary-filters{grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}.secondary-filters>.filter-actions{grid-column:1/-1}}
+@media(max-width:430px){.secondary-filters{grid-template-columns:minmax(0,1fr)}}
+.schedule-job-detail>.meta>span:nth-child(2){display:none}
+.schedule-filter-panel .quick-date-field .quick-date-options{grid-template-columns:repeat(2,minmax(0,1fr))}
+@media(max-width:760px){.schedule-filter-panel .quick-date:hover:not(.selected),.schedule-filter-panel .quick-date:focus:not(.selected){border-color:#e1e7e0;background:#fff;color:#445347}}
+
+/* Stack the quick-date choices and keep agreement as the final option. */
+.schedule-filter-panel .quick-date-field .quick-date-options {
+  grid-template-columns: minmax(0, 1fr);
+}
+
+@media (min-width: 1101px) {
+  .primary-filters {
+    grid-template-columns: minmax(0, 1fr) minmax(145px, .56fr) minmax(0, .58fr) minmax(0, .58fr);
+  }
+}
+
+@media (min-width: 1101px) {
+  .schedule-filter-panel .primary-filters {
+    grid-template-columns: minmax(0, 1fr) minmax(145px, .56fr) minmax(0, .58fr) minmax(0, .58fr);
+  }
+}
+
+/* Compact one-row quick date choices without reducing the text size. */
+.schedule-filter-panel .quick-date-field .quick-date-options {
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: 4px;
+}
+
+.schedule-filter-panel .quick-date-field .quick-date {
+  min-width: 0;
+  min-height: 0;
+  padding: 7px 4px;
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: normal;
+}
+
+@media (min-width: 1101px) {
+  .schedule-filter-panel .primary-filters {
+    grid-template-columns: minmax(260px, 1.2fr) minmax(300px, 1.2fr) minmax(160px, .7fr) minmax(160px, .7fr);
+  }
+}
+
+/* Align the date label with the search label in the first filter row. */
+.schedule-filter-panel .primary-filters {
+  align-items: start;
+}
+
+/* Natural-width date chips make the row balanced and keep agreement readable. */
+.schedule-filter-panel .quick-date-field .quick-date-options {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  justify-content: flex-start;
+  gap: 6px;
+}
+
+.schedule-filter-panel .quick-date-field .quick-date {
+  flex: 0 0 auto;
+  min-width: max-content;
+  min-height: 38px;
+  padding: 8px 10px;
+  border-radius: 9px;
+  font-size: 13px;
+  line-height: 1.25;
+  white-space: nowrap;
+}
+
+/* Match quick-date controls to the neighboring filter fields. */
+.schedule-filter-panel .quick-date-field .quick-date-options {
+  width: 100%;
+}
+
+.schedule-filter-panel .quick-date-field .quick-date {
+  flex: 1 0 auto;
+  min-height: 48px;
+  padding: 8px 10px;
+}
+
+@media (max-width: 760px) {
+  .schedule-filter-panel .quick-date:not(.selected):hover,
+  .schedule-filter-panel .quick-date:not(.selected):focus,
+  .schedule-filter-panel .quick-date:not(.selected):active {
+    border-color: var(--border, #e1e7e0) !important;
+    background: var(--surface-elevated, #fff) !important;
+    color: var(--text-primary, #445347) !important;
+  }
+}

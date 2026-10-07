@@ -1,0 +1,638 @@
+/* Mobile-first layout for the mixed latest-listings feed. */
+@media (max-width: 760px) {
+  #latest-jobs .job-grid {
+    grid-template-columns: minmax(0, 1fr) !important;
+    align-items: stretch;
+    gap: 14px;
+  }
+
+  #latest-jobs .job-grid > .job-card,
+  #latest-jobs .job-grid > .worker-card {
+    width: 100%;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 16px;
+    overflow: visible;
+    border-radius: 16px;
+  }
+
+  #latest-jobs .job-card {
+    display: flex;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+  }
+
+  #latest-jobs .job-card > .card-top {
+    order: 0;
+    display: flex;
+    min-height: 36px;
+    align-items: center;
+    justify-content: space-between;
+    flex-wrap: wrap;
+    gap: 8px;
+    margin: 0 0 10px;
+  }
+
+  #latest-jobs .job-card > .card-top::before {
+    display: none;
+  }
+
+  #latest-jobs .job-card > .card-top > .pill {
+    display: inline-flex !important;
+    min-height: 25px;
+    align-items: center;
+    padding: 4px 9px;
+    font-size: 10px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  #latest-jobs .job-card > .card-top > .save-btn {
+    flex: 0 0 40px;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px;
+    min-height: 40px;
+  }
+
+  #latest-jobs .job-card > h3 {
+    order: 1;
+    display: block;
+    min-height: 0;
+    max-height: none;
+    margin: 0 0 9px;
+    overflow: visible;
+    font-size: 17px;
+    line-height: 1.4;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .job-card > .meta {
+    order: 2;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 6px 10px;
+    margin: 0 0 10px;
+    font-size: 12px;
+    line-height: 1.45;
+  }
+
+  #latest-jobs .job-card > .job-description {
+    order: 3;
+    display: -webkit-box !important;
+    max-height: 4.65em;
+    margin: 0 0 12px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.55;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  #latest-jobs .job-card > .card-bottom {
+    order: 4;
+    display: flex !important;
+    align-items: center;
+    justify-content: space-between;
+    gap: 12px;
+    margin: 0 !important;
+    padding-top: 11px;
+    border-top: 1px solid var(--border);
+  }
+
+  #latest-jobs .job-card > .card-bottom > .price {
+    min-width: 0;
+    margin: 0;
+    font-size: 19px;
+    line-height: 1.25;
+    text-align: left;
+    white-space: normal;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .price small {
+    display: inline;
+    font-size: 11px;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .btn {
+    flex: 0 0 auto;
+    width: auto;
+    min-width: 118px;
+    min-height: 44px;
+    padding: 8px 12px;
+    font-size: 12px;
+    white-space: nowrap;
+  }
+
+  #latest-jobs .job-card > .posted {
+    order: 5;
+    display: block !important;
+    margin: 8px 0 0;
+    padding: 0;
+    border: 0;
+    font-size: 10px;
+    line-height: 1.35;
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card {
+    display: grid !important;
+    grid-template-columns: 46px minmax(0, 1fr);
+    grid-template-areas:
+      "type type"
+      "avatar name"
+      "avatar location"
+      "offer offer"
+      "about about"
+      "stats stats"
+      "button button";
+    align-items: center;
+    column-gap: 11px;
+    row-gap: 0;
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card > .home-listing-card-top {
+    grid-area: type;
+    display: flex !important;
+    min-height: 36px;
+    align-items: center;
+    justify-content: flex-start;
+    margin: 0 0 8px;
+    padding: 0 50px 0 0;
+  }
+
+  #latest-jobs .worker-card > .home-listing-card-top > .home-listing-type {
+    max-width: 100%;
+    min-height: 25px;
+    padding: 4px 9px;
+    font-size: 10px;
+    line-height: 1.25;
+    white-space: normal;
+  }
+
+  #latest-jobs .worker-card > .profile-save-button {
+    top: 16px;
+    right: 16px;
+    width: 40px !important;
+    min-width: 40px !important;
+    height: 40px;
+    min-height: 40px;
+    padding: 0 !important;
+  }
+
+  #latest-jobs .worker-card > .profile-save-button .day-icon {
+    width: 18px;
+    height: 18px;
+  }
+
+  #latest-jobs .worker-card > .market-avatar {
+    grid-area: avatar;
+    justify-self: start;
+    width: 46px !important;
+    height: 46px !important;
+    margin: 0 !important;
+  }
+
+  #latest-jobs .worker-card > h3 {
+    grid-area: name;
+    display: block;
+    min-height: 0;
+    max-height: none;
+    margin: 0;
+    padding: 0;
+    overflow: visible;
+    font-size: 15px;
+    line-height: 1.35;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .worker-card > p:first-of-type {
+    grid-area: location;
+    display: block !important;
+    margin: 2px 0 0;
+    font-size: 12px;
+    line-height: 1.4;
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card > .worker-offer {
+    grid-area: offer;
+    display: grid !important;
+    margin: 13px 0 10px;
+    padding: 12px 14px;
+    border: 1px solid color-mix(in srgb, var(--accent) 35%, var(--border));
+    border-left: 3px solid var(--accent);
+    border-radius: 11px;
+    background: var(--accent-soft);
+    color: var(--text-primary);
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card > .worker-offer strong {
+    display: -webkit-box;
+    overflow: hidden;
+    font-size: 16px;
+    line-height: 1.45;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #latest-jobs .worker-card > .skills,
+  #latest-jobs .worker-card > .rating-inline,
+  #latest-jobs .worker-card > .listing-view-count {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > p:nth-of-type(2) {
+    grid-area: about;
+    display: -webkit-box !important;
+    max-height: 4.65em;
+    margin: 0 0 2px;
+    overflow: hidden;
+    font-size: 13px;
+    line-height: 1.55;
+    text-align: left;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 3;
+  }
+
+  #latest-jobs .worker-card > .worker-stats {
+    grid-area: stats;
+    display: grid !important;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    gap: 8px;
+    width: 100%;
+    margin: 12px 0 0;
+    padding: 10px 8px;
+    font-size: 10px;
+    line-height: 1.35;
+  }
+
+  #latest-jobs .worker-card > .worker-stats-no-experience {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+  }
+
+  #latest-jobs .worker-card > .worker-stats > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .worker-card > .worker-stats strong {
+    display: block;
+    margin-bottom: 3px;
+    font-size: 13px;
+    line-height: 1.3;
+    white-space: normal;
+  }
+
+  #latest-jobs .worker-card .worker-stat-label {
+    display: block;
+    font-size: 9px;
+    line-height: 1.3;
+  }
+
+  #latest-jobs .worker-card > .btn {
+    grid-area: button;
+    width: 100%;
+    min-height: 44px;
+    margin: 12px 0 0 !important;
+    padding: 9px 12px;
+    font-size: 13px;
+  }
+
+  #latest-jobs .worker-card.worker-offer-missing {
+    grid-template-areas:
+      "type type"
+      "avatar name"
+      "avatar location"
+      "about about"
+      "stats stats"
+      "button button";
+  }
+}
+
+@media (max-width: 380px) {
+  #latest-jobs .job-card > .card-bottom {
+    align-items: stretch;
+    flex-direction: column;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .price {
+    text-align: left;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .btn {
+    width: 100%;
+  }
+}
+
+/* Keep all three newest listings in one row on phones, as requested. */
+@media (max-width: 760px) {
+  #latest-jobs .job-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+    gap: 8px;
+  }
+
+  #latest-jobs .job-grid > .job-card,
+  #latest-jobs .job-grid > .worker-card {
+    min-width: 0;
+    height: auto !important;
+    min-height: 0 !important;
+    max-height: none !important;
+    padding: 9px 7px;
+    border-radius: 12px;
+    overflow: hidden;
+  }
+
+  #latest-jobs .job-card {
+    display: flex;
+    flex-direction: column;
+  }
+
+  #latest-jobs .job-card > .card-top {
+    min-height: 26px;
+    flex-wrap: nowrap;
+    gap: 3px;
+    margin: 0 0 5px;
+  }
+
+  #latest-jobs .job-card > .card-top > .pill:not(.home-listing-type) {
+    display: none !important;
+  }
+
+  #latest-jobs .job-card > .card-top > .home-listing-type {
+    min-height: 18px;
+    max-width: calc(100% - 27px);
+    padding: 2px 5px;
+    font-size: 7px;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  #latest-jobs .job-card > .card-top > .save-btn {
+    flex-basis: 26px;
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px;
+    min-height: 26px;
+  }
+
+  #latest-jobs .job-card > h3 {
+    min-height: 0;
+    max-height: 2.6em;
+    margin: 0 0 5px;
+    overflow: hidden;
+    font-size: 10px;
+    line-height: 1.3;
+    -webkit-box-orient: vertical;
+    -webkit-line-clamp: 2;
+  }
+
+  #latest-jobs .job-card > .meta {
+    display: flex !important;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 3px;
+    margin: 0 0 5px;
+    font-size: 8px;
+    line-height: 1.25;
+  }
+
+  #latest-jobs .job-card > .posted {
+    display: none !important;
+  }
+
+  #latest-jobs .job-card > .meta > span:not(:first-child) {
+    display: none !important;
+  }
+
+  #latest-jobs .job-card > .job-description {
+    order: 3;
+    display: block !important;
+    max-height: 3.9em;
+    margin: 1px 0 7px;
+    overflow: hidden;
+    font-size: 8px;
+    line-height: 1.3;
+    overflow-wrap: anywhere;
+    -webkit-line-clamp: unset;
+  }
+
+  #latest-jobs .job-card > .card-bottom {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 6px;
+    margin: 7px 0 0 !important;
+    padding: 0;
+    border: 0;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .price {
+    margin: 0;
+    font-size: 12px;
+    line-height: 1.25;
+    text-align: center;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .price small {
+    display: block;
+    font-size: 8px;
+  }
+
+  #latest-jobs .job-card > .card-bottom > .btn {
+    width: 100%;
+    min-width: 0;
+    min-height: 28px;
+    padding: 3px 4px;
+    font-size: 8px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  #latest-jobs .worker-card {
+    display: flex !important;
+    flex-direction: column;
+    align-items: stretch;
+    gap: 0;
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card > .home-listing-card-top {
+    display: flex !important;
+    order: 0;
+    min-height: 22px;
+    align-items: center;
+    margin: 0 28px 4px 0;
+    padding: 0;
+  }
+
+  #latest-jobs .worker-card > .home-listing-card-top > .home-listing-type {
+    max-width: 100%;
+    min-height: 18px;
+    padding: 2px 5px;
+    font-size: 7px;
+    line-height: 1.1;
+    white-space: normal;
+  }
+
+  #latest-jobs .worker-card > .profile-save-button {
+    top: 7px;
+    right: 7px;
+    width: 26px !important;
+    min-width: 26px !important;
+    height: 26px;
+    min-height: 26px;
+    gap: 0;
+    font-size: 0;
+  }
+
+  #latest-jobs .worker-card > .profile-save-button .profile-save-label {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > .profile-save-button .day-icon {
+    width: 14px;
+    height: 14px;
+  }
+
+  #latest-jobs .worker-card > .market-avatar {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > h3,
+  #latest-jobs .worker-card > p:nth-of-type(2) {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > p:first-of-type {
+    order: 2;
+    display: block !important;
+    margin: 0 0 5px;
+    font-size: 8px;
+    line-height: 1.2;
+    text-align: left;
+  }
+
+  #latest-jobs .worker-card > .worker-offer {
+    order: 1;
+    display: block !important;
+    margin: 0 0 6px;
+    padding: 7px 6px;
+    border-left-width: 2px;
+    border-radius: 8px;
+  }
+
+  #latest-jobs .worker-card > .worker-offer strong {
+    display: -webkit-box;
+    font-size: 11px;
+    line-height: 1.3;
+    -webkit-line-clamp: 3;
+  }
+
+  #latest-jobs .worker-card > .skills,
+  #latest-jobs .worker-card > .rating-inline,
+  #latest-jobs .worker-card > .listing-view-count {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > .worker-stats {
+    order: 3;
+    display: grid !important;
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: 4px;
+    width: 100%;
+    margin: 0 0 6px;
+    padding: 5px 4px;
+    font-size: 7px;
+    line-height: 1.2;
+  }
+
+  #latest-jobs .worker-card > .worker-stats > span:not(.worker-pay-stat):not(.worker-availability-stat) {
+    display: none !important;
+  }
+
+  #latest-jobs .worker-card > .worker-stats > span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  #latest-jobs .worker-card > .worker-stats strong {
+    margin-bottom: 2px;
+    font-size: 8px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+
+  #latest-jobs .worker-card .worker-stat-label {
+    display: block;
+    font-size: 7px;
+    line-height: 1.2;
+  }
+
+  #latest-jobs .worker-card > .btn {
+    order: 4;
+    min-height: 28px;
+    margin: auto 0 0 !important;
+    padding: 3px 4px;
+    font-size: 8px;
+    line-height: 1.2;
+    white-space: normal;
+  }
+}
+
+@media (max-width: 380px) {
+  #latest-jobs .job-grid {
+    gap: 6px;
+  }
+
+  #latest-jobs .job-grid > .job-card,
+  #latest-jobs .job-grid > .worker-card {
+    padding: 8px 5px;
+  }
+
+  #latest-jobs .worker-card > .worker-offer strong {
+    font-size: 10px;
+  }
+}
+
+/* Mobile header CTA: show its purpose instead of the plus icon. */
+@media (max-width: 480px) {
+  .header > .header-cta {
+    display: inline-flex;
+    flex: 0 0 auto;
+    min-width: 84px;
+    max-width: 108px;
+    height: 42px;
+    padding: 4px 6px;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .header > .header-cta > .cta-label {
+    display: inline-block !important;
+    max-width: 100%;
+    font-size: 9px !important;
+    line-height: 1.15;
+    white-space: normal;
+    text-align: center;
+  }
+
+  .header > .header-cta > .day-icon {
+    display: none !important;
+  }
+}
+
+@media (max-width: 360px) {
+  .header > .header-cta {
+    min-width: 72px;
+    max-width: 76px;
+  }
+
+  .header > .header-cta > .cta-label {
+    font-size: 8px !important;
+  }
+}
