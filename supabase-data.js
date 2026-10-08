@@ -16,6 +16,8 @@
   let profile = null;
   let writeQueue = Promise.resolve();
   let initialized = false;
+  let initializationPromise = null;
+  let startupLoadPromise = Promise.resolve();
 
   const clone = value => value == null ? value : JSON.parse(JSON.stringify(value));
   const keyOf = row => String(row?.id ?? '');
@@ -120,9 +122,25 @@
     setCache('dge-accounts', rows);
   }
 
-  async function load() {
-    const categoryRows = await optionalRows('categories', 'id,name,is_active', true);
-    const subcategoryRows = await optionalRows('subcategories', 'id,category_id,name,is_active', true);
+  async function load(onPrimaryReady) {
+    const secondaryRowsPromise = Promise.all(authUser ? [
+      optionalRows('saved_jobs'), optionalRows('saved_worker_profiles'),
+      optionalRows('saved_profiles'), optionalRows('reviews'), optionalRows('reports'),
+      optionalRows('review_reports'), optionalRows('listing_views'),
+      isAdmin() ? optionalRows('admin_activity') : Promise.resolve([]),
+      optionalRows('public_profiles', 'id,display_name,profile_photo_path')
+    ] : [
+      Promise.resolve([]), Promise.resolve([]), Promise.resolve([]), optionalRows('reviews'),
+      Promise.resolve([]), Promise.resolve([]), optionalRows('listing_views'),
+      Promise.resolve([]), optionalRows('public_profiles', 'id,display_name,profile_photo_path')
+    ]);
+    const [categoryRows, subcategoryRows, rawJobs, rawWorkers, jobLinks, workerLinks] = await Promise.all([
+      optionalRows('categories', 'id,name,is_active', true),
+      optionalRows('subcategories', 'id,category_id,name,is_active', true),
+      optionalRows('job_posts', '*', true), optionalRows('worker_profiles', '*', true),
+      optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
+      optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
+    ]);
     categoryIds.clear();
     subcategoryIds.clear();
     categoryRows.filter(row => row.is_active).forEach(row => categoryIds.set(row.name, row.id));
@@ -130,11 +148,6 @@
       subcategoryIds.set(row.category_id + '|' + row.name, row.id);
     });
 
-    const [rawJobs, rawWorkers, jobLinks, workerLinks] = await Promise.all([
-      optionalRows('job_posts', '*', true), optionalRows('worker_profiles', '*', true),
-      optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
-      optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
-    ]);
     const categoryById = new Map(categoryRows.map(row => [row.id, row]));
     const subcategoryById = new Map(subcategoryRows.map(row => [row.id, row]));
     const jobLinkMap = new Map();
@@ -199,13 +212,10 @@
     });
     setCache('dge-jobs', jobs);
     setCache('dge-workers', workers);
+    onPrimaryReady?.();
 
     const [savedJobs, savedWorkers, savedProfiles, rawReviews,
-      rawReports, rawReviewReports, rawViews] = authUser ? await Promise.all([
-      optionalRows('saved_jobs'), optionalRows('saved_worker_profiles'),
-      optionalRows('saved_profiles'), optionalRows('reviews'), optionalRows('reports'),
-      optionalRows('review_reports'), optionalRows('listing_views')
-    ]) : [[], [], [], await optionalRows('reviews'), [], [], await optionalRows('listing_views')];
+      rawReports, rawReviewReports, rawViews, activity, publicProfiles] = await secondaryRowsPromise;
 
     const saved = savedJobs.map(row => legacyId('jobs', row.job_post_id));
     setCache('dge-saved', saved);
@@ -251,14 +261,12 @@
     }, { jobs: {}, profiles: {} });
     setCache('dge-view-counts-v1', countRows);
 
-    const activity = authUser && isAdmin() ? await optionalRows('admin_activity') : [];
     setCache('dge-admin-activity', activity.map(row => ({
       id: row.id, adminId: row.admin_id, action: row.action,
       targetType: row.target_type, targetId: row.target_id,
       note: row.note || '', createdAt: Date.parse(row.created_at) || Date.now()
     })));
 
-    const publicProfiles = await optionalRows('public_profiles', 'id,display_name,profile_photo_path');
     cacheAccounts(publicProfiles);
     if (authUser) await migrateLegacyOwnedData(jobs, workers, saved, savedProfileIds);
   }
@@ -400,22 +408,38 @@
     return created;
   }
 
-  async function initialize() {
-    if (initialized) return;
-    client = window.pove24Supabase;
-    if (!client) throw new Error('Supabase client was not initialized.');
-    const { data, error } = await client.auth.getSession();
-    if (error) throw error;
-    authUser = data.session?.user || null;
-    if (authUser) {
-      profile = await loadCurrentProfile(authUser);
-      setCache('dge-user', mapProfile(authUser, profile));
-    } else {
-      profile = null;
-      setCache('dge-user', null);
-    }
-    await load();
-    initialized = true;
+  function initialize() {
+    if (initialized) return Promise.resolve();
+    if (initializationPromise) return initializationPromise;
+    initializationPromise = (async () => {
+      client = window.pove24Supabase;
+      if (!client) throw new Error('Supabase client was not initialized.');
+      const { data, error } = await client.auth.getSession();
+      if (error) throw error;
+      authUser = data.session?.user || null;
+      if (authUser) {
+        profile = await loadCurrentProfile(authUser);
+        setCache('dge-user', mapProfile(authUser, profile));
+      } else {
+        profile = null;
+        setCache('dge-user', null);
+      }
+      let resolvePrimary, rejectPrimary;
+      const primaryReady = new Promise((resolve, reject) => {
+        resolvePrimary = resolve;
+        rejectPrimary = reject;
+      });
+      startupLoadPromise = load(resolvePrimary)
+        .then(() => { initialized = true; })
+        .catch(error => { rejectPrimary(error); throw error; });
+      startupLoadPromise.catch(() => {});
+      await primaryReady;
+    })();
+    return initializationPromise;
+  }
+
+  function waitUntilReady() {
+    return startupLoadPromise;
   }
 
   async function refreshSession() {
@@ -494,7 +518,6 @@
     job.uuid = saved.id;
     const contact = String(job.phone || '').trim();
     if (contact) await run(client.from('job_contacts').upsert({ job_post_id: saved.id, phone: contact }, { onConflict: 'job_post_id' }));
-    else await run(client.from('job_contacts').delete().eq('job_post_id', saved.id));
     await replaceCategories('job_post_categories', 'job_post_id', saved.id, selections);
     if (oldUuid && oldUuid !== saved.id) ids.jobs.set(String(oldUuid), saved.id);
   }
@@ -523,7 +546,6 @@
     worker.uuid = saved.id;
     const contact = String(worker.phone || '').trim();
     if (contact) await run(client.from('worker_profile_contacts').upsert({ worker_profile_id: saved.id, phone: contact }, { onConflict: 'worker_profile_id' }));
-    else await run(client.from('worker_profile_contacts').delete().eq('worker_profile_id', saved.id));
     await replaceCategories('worker_profile_categories', 'worker_profile_id', saved.id, selections);
   }
 
@@ -703,7 +725,7 @@
   }
 
   window.Pove24Store = {
-    initialize, refreshSession, flush, get, set, accountRef, sameUser,
+    initialize, waitUntilReady, refreshSession, flush, get, set, accountRef, sameUser,
     resolveId, lookupProfileId, isAdmin, get client() { return client; },
     get authUser() { return authUser; }, get profile() { return profile; },
     get initialized() { return initialized; }, exportLegacySnapshot,

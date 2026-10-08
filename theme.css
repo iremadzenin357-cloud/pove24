@@ -199,6 +199,8 @@ html[data-theme="dark"] .star-picker button{color:#627067}
 html[data-theme="dark"] :is(.notice,.empty,.admin-empty,.admin-denied){border-color:var(--border);background:#202a24;color:var(--text-secondary)}
 html[data-theme="dark"] :is(.success-box,.notice-success){border-color:#416b4e;background:#20392a;color:#a9e5ba}
 html[data-theme="dark"] :is(.error-msg,.error-box,.notice-error){border-color:#754a43;background:#3a2926;color:#f2b4a9}
+html[data-theme="dark"] #postForm .field > .error-msg,
+html[data-theme="dark"] #workerProfileForm .field > .error-msg{background:transparent}
 html[data-theme="dark"] .filter-note{border:1px solid #5b4b2c;background:#352f22;color:#e8cf91}
 html[data-theme="dark"] .pill-sub,html[data-theme="dark"] .skill{background:#2b352e;color:#c2d0c5}
 html[data-theme="dark"] .filter-chip{border-color:#405448;background:#26372d;color:#c7e9d0}
@@ -581,7 +583,7 @@ html[data-theme=dark] .pill-sub{border-color:#435449;background:#29362e;color:#c
 /* Keep registration extras consistent with the dark theme. */
 html[data-theme="dark"] .auth-card-register .auth-extras {
   border-color: var(--border);
-  background: #202b24;
+  background: transparent;
   color: var(--text-primary);
 }
 html[data-theme="dark"] .auth-card-register .auth-extras .field > label,
@@ -664,3 +666,15 @@ html[data-theme="dark"] .auth-card-register .auth-role-field .radio-option:has(i
   }
 }
 html[data-theme="dark"] .social-modal-close{border-color:#506757;background:#29352e;color:#e1efe4;box-shadow:0 2px 9px rgba(0,0,0,.28)}html[data-theme="dark"] .social-modal-close:hover{border-color:#75bd91;background:#355341;color:#fff;box-shadow:0 4px 12px rgba(0,0,0,.36);transform:rotate(90deg)}
+
+/* Public listing status appears on job search cards and job details only. */
+.listing-status-badge{display:inline-flex;flex:0 0 auto;align-items:center;width:max-content;max-width:100%;padding:3px 8px;border:1px solid #dce8df;border-radius:999px;background:#edf5ef;color:#286143;font-size:10px;font-weight:650;line-height:1.35;white-space:nowrap}
+.listing-status-completed{border-color:#d9dfdb;background:#eef0ee;color:#68716b}
+.job-card>.schedule-card-meta>.listing-status-badge{width:max-content;padding:3px 8px;border-radius:999px;font-size:10px;line-height:1.35}
+.detail-main>.meta>.listing-status-badge{font-size:11px;line-height:1.35}
+html[data-theme="dark"] .listing-status-active{border-color:#385641;background:#203b2d;color:#a9dfb5}
+html[data-theme="dark"] .listing-status-completed{border-color:#46504a;background:#2b312d;color:#c4cbc6}
+
+
+/* Homepage search actions: unified split control */
+html[data-theme="dark"] .home-search-actions{border-color:#35463a;background:#1b241f}html[data-theme="dark"] .home-search-actions .home-search-action-jobs{color:#eef4ef}html[data-theme="dark"] .home-search-actions .home-search-action-jobs:hover{border-color:#465d4d;background:#26332b}html[data-theme="dark"] .home-search-action-jobs .home-search-action-icon,html[data-theme="dark"] .home-search-action-jobs .home-search-action-arrow{background:#2a3c31;color:#9bd8aa}html[data-theme="dark"] .home-search-actions .home-search-action-workers{border-color:#247b5b;background:#176b51;color:#fff}html[data-theme="dark"] .home-search-actions .home-search-action-workers:hover{border-color:#32936e;background:#20805d}

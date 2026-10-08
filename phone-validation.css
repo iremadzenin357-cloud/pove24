@@ -1,0 +1,23 @@
+.georgian-phone-control{display:flex;align-items:stretch;width:100%;min-width:0;min-height:48px;overflow:hidden;border:1px solid var(--border,#d8e0da);border-radius:12px;background:var(--input-background,#fff);transition:border-color .18s,box-shadow .18s}
+.georgian-phone-control:focus-within{border-color:var(--text-muted,#718078);box-shadow:0 0 0 2px color-mix(in srgb,var(--text-muted,#718078) 20%,transparent)}
+.georgian-phone-prefix{display:inline-flex;flex:none;align-items:center;justify-content:center;gap:8px;min-width:94px;padding:0 13px;border-right:1px solid var(--border,#d8e0da);background:var(--surface,#f6f8f5);color:var(--text-primary,#27332c);font-size:14px;font-weight:700;white-space:nowrap}
+.georgian-phone-flag{font-size:18px;line-height:1}
+.georgian-phone-note{display:block;margin-top:6px;color:var(--muted,#738078);font-size:12px;line-height:1.45}
+.georgian-phone-note[hidden]{display:none}
+.georgian-phone-control input.georgian-phone-input{flex:1 1 0;width:0!important;min-width:0!important;min-height:46px!important;margin:0!important;padding:9px 12px!important;border:0!important;border-radius:0!important;outline:0!important;background:transparent!important;color:var(--text-primary,#27332c)!important;box-shadow:none!important;font:inherit;font-size:16px;letter-spacing:.035em}
+.georgian-phone-control input.georgian-phone-input::placeholder{color:var(--muted,#87948b);letter-spacing:.04em}
+.georgian-phone-error{display:block;margin-top:6px;color:#b5473a;font-size:12px;line-height:1.45}
+.georgian-phone-error[hidden]{display:none}
+.georgian-phone-control.has-error{border-color:#c85a4e}
+.georgian-phone-control.has-error:focus-within{border-color:#c85a4e;box-shadow:0 0 0 3px rgba(200,90,78,.13)}
+html[data-theme="dark"] .georgian-phone-control{border-color:var(--border);background:var(--surface)}
+html[data-theme="dark"] .georgian-phone-prefix{border-color:var(--border);background:transparent;color:var(--text-primary)}
+html[data-theme="dark"] .georgian-phone-control input.georgian-phone-input{border:0!important;background:transparent!important;color:var(--text-primary)!important;box-shadow:none!important}
+html[data-theme="dark"] .georgian-phone-control input.georgian-phone-input:-webkit-autofill,
+html[data-theme="dark"] .georgian-phone-control input.georgian-phone-input:-webkit-autofill:hover,
+html[data-theme="dark"] .georgian-phone-control input.georgian-phone-input:-webkit-autofill:focus{ -webkit-text-fill-color:var(--text-primary)!important;-webkit-box-shadow:0 0 0 1000px var(--surface) inset!important;caret-color:var(--text-primary)}
+html[data-theme="dark"] .georgian-phone-control:focus-within{border-color:var(--text-muted);box-shadow:0 0 0 2px color-mix(in srgb,var(--text-muted) 20%,transparent)}
+html[data-theme="dark"] .georgian-phone-control.has-error,
+html[data-theme="dark"] .georgian-phone-control.has-error:focus-within{border-color:#c85a4e}
+html[data-theme="dark"] .georgian-phone-control.has-error:focus-within{box-shadow:0 0 0 3px rgba(200,90,78,.16)}
+@media(max-width:360px){.georgian-phone-prefix{min-width:82px;padding-inline:9px;gap:6px}.georgian-phone-control input.georgian-phone-input{padding-inline:9px!important;font-size:16px}}

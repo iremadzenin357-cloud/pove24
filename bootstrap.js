@@ -41,13 +41,13 @@
     'feature-config.js?v=20260930-ratings-off',
     'avatar.js',
     'profile-media.js?v=20261004-photo-hint-no-repeat',
-    'app.js?v=20261008-features-off',
-    'flow.js?v=20261007-worker-city-area',
-    'geo-ui.js?v=20261008-home-search-work-wording',
+    'app.js?v=20261008-seamless-startup-v1',
+    'flow.js?v=20261008-seamless-startup-v1',
+    'geo-ui.js?v=20261008-home-search-actions-v2',
     'ratings.js?v=20261008-features-off',
-    'schedule.js?v=20261008-post-fields-mobile-dock',
+    'schedule.js?v=20261008-worker-experience-duration-inline-validation-v2',
     'social.js?v=20261008-features-off',
-    'job-status.js?v=20261008-features-off',
+    'job-status.js?v=20261008-status-icons-check-cross',
     'admin.js?v=20261008-features-off',
     'mobile-account-nav.js?v=20260930-mobile-profile-slot',
     'polish.js?v=20260930-nav-premium',
@@ -61,48 +61,73 @@
     'ratings-feature.js?v=20261008-features-off',
     'theme.js?v=20260930-dark-mode',
     'job-search-save.js?v=20260930-hide-search-subcategory',
-    'view-counts.js?v=20261002-detail-publication-meta',
+    'view-counts.js?v=20261008-job-status-placement',
     'worker-search-filters.js?v=20261007-worker-city-area',
-    'listing-pagination.js?v=20261002-prev-hidden-first',
-    'home-listing-types.js?v=20261004-mobile-carousel-steady',
-    'navigation-performance.js?v=20261002-single-route-handler'
+    'listing-pagination.js?v=20261008-status-group-order',
+    'home-listing-types.js?v=20261008-active-home-jobs',
+    'navigation-performance.js?v=20261008-seamless-startup-v1'
   ];
 
-  function loadScript(src) {
-    return new Promise((resolve, reject) => {
+  function loadScriptsInOrder(sources, continueOnError = false) {
+    const loads = sources.map(src => new Promise((resolve, reject) => {
       const script = document.createElement('script');
+      // Download scripts together while keeping their dependency order at execution time.
+      script.async = false;
       script.src = src;
       script.onload = resolve;
       script.onerror = () => reject(new Error('Could not load ' + src));
       document.body.appendChild(script);
+    }));
+    return Promise.all(continueOnError
+      ? loads.map(load => load.catch(error => console.error('[Pove24] App script failed:', error)))
+      : loads);
+  }
+
+  function preloadScripts(sources) {
+    return sources.map(src => {
+      const link = document.createElement('link');
+      link.rel = 'preload';
+      link.as = 'script';
+      link.href = src;
+      document.head.appendChild(link);
+      return link;
     });
   }
 
+  const preloadedScripts = preloadScripts([...legacyScriptUrls, 'supabase-auth.js']);
   try {
-    await loadScript('https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2');
-    await loadScript('supabase-config.js');
-    await loadScript('supabase-client.js');
-    await loadScript('supabase-data.js');
+    await loadScriptsInOrder([
+      'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
+      'supabase-config.js',
+      'supabase-client.js',
+      'phone-validation.js?v=20261008-georgian-mobile-prefix-neutral-focus',
+      'supabase-data.js?v=20261008-parallel-startup-v2'
+    ]);
+
+    // Fetch app scripts alongside Supabase's first data load; execute them only
+    // after the signed-in state is ready, so protected routes keep their behavior.
     await window.Pove24Store.initialize();
-    await loadScript('supabase-auth.js');
+    await loadScriptsInOrder(['supabase-auth.js']);
+    await loadScriptsInOrder(legacyScriptUrls, true);
+    preloadedScripts.forEach(link => link.remove());
+    window.Pove24AppBridge?.hydrate();
+    await window.Pove24Store.waitUntilReady();
+    window.Pove24AppBridge?.hydrate();
+    const app = document.getElementById('app');
+    app?.removeAttribute('inert');
+    app?.removeAttribute('aria-busy');
   } catch (error) {
     console.error('[Pove24] Supabase startup failed:', error);
     const app = document.getElementById('app');
     if (app) {
+      app.removeAttribute('inert');
+      app.removeAttribute('aria-busy');
       app.innerHTML = '<section class="container"><div class="empty"><strong>საიტთან დაკავშირება ვერ მოხერხდა</strong><p>განაახლე გვერდი და სცადე ხელახლა. თუ პრობლემა გაგრძელდა, გადაამოწმე Supabase-ის პარამეტრები.</p></div></section>';
       const detail = document.createElement('small');
       detail.textContent = error?.message || 'Supabase connection error';
       app.querySelector('.empty')?.append(detail);
     }
     return;
-  }
-
-  for (const src of legacyScriptUrls) {
-    try {
-      await loadScript(src);
-    } catch (error) {
-      console.error('[Pove24] App script failed:', error);
-    }
   }
 
 })();

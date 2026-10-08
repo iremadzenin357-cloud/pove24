@@ -39,8 +39,8 @@ function appendDetailPublicationMeta(html,meta){
 }
 
 const jobCardWithViewCount=jobCard;
-jobCard=function(job){
- let html=jobCardWithViewCount(job);
+jobCard=function(job,options={}){
+ let html=jobCardWithViewCount(job,options);
  const postedStart=html.indexOf('<div class="posted">');
  if(postedStart>=0){
   const postedEnd=html.indexOf('</div>',postedStart);

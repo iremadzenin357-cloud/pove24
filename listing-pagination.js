@@ -61,6 +61,7 @@
       card.dataset.listingTimestamp = timestamp === null ? '' : String(timestamp);
       card.dataset.listingPrice = price !== null && Number.isFinite(price) ? String(price) : '';
       card.dataset.listingPaymentType = String(record?.paymentType || 'daily');
+      if (kind === 'jobs') card.dataset.listingStatus = String(record?.status || '');
     });
   }
 
@@ -74,6 +75,11 @@
     const sorted = [...candidates].sort((left, right) => {
       const leftOrder = Number(left.dataset.listingOrder) || 0;
       const rightOrder = Number(right.dataset.listingOrder) || 0;
+      if (kind === 'jobs') {
+        const statusRank = status => status === 'active' ? 0 : status === 'completed' ? 1 : 2;
+        const statusDifference = statusRank(left.dataset.listingStatus) - statusRank(right.dataset.listingStatus);
+        if (statusDifference) return statusDifference;
+      }
       if (sort === 'price-asc' || sort === 'price-desc') {
         const a = left.dataset.listingPrice === '' ? null : Number(left.dataset.listingPrice);
         const b = right.dataset.listingPrice === '' ? null : Number(right.dataset.listingPrice);

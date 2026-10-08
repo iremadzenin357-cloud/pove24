@@ -158,7 +158,7 @@
   }
 
   function allListings() {
-    const offers = jobs.map((item, index) => ({ item, kind: 'offer', index, time: postedTime(item) }));
+    const offers = jobs.filter(item => item?.status === 'active').map((item, index) => ({ item, kind: 'offer', index, time: postedTime(item) }));
     const allWorkers = [...get('dge-workers', []), ...seedWorkers];
     const seen = new Set();
     const seekers = allWorkers

@@ -20,10 +20,27 @@
 .managed-job-tools .btn{grid-column:1/-1;width:100%}
 .managed-job-tools .delete-job-btn{border-color:#ead1ce;background:#fff;color:#a4473e}
 .managed-job-tools .delete-job-btn:hover{border-color:#d8aaa4;background:#fbefed;color:#8d332b}
-.status-control{display:flex;align-items:center;gap:8px;font-size:12px;color:var(--muted)}
+.status-control{display:grid;align-items:stretch;gap:7px;font-size:12px;color:var(--muted)}
+.status-control-label{font-size:12px;color:var(--text-secondary)}
 .status-control select{max-width:100%;min-width:150px;min-height:42px;border:1px solid var(--line);border-radius:9px;background:#fff;padding:8px 10px;color:var(--ink);font:inherit;font-size:12px}
-.managed-job-tools .status-control{grid-column:1/-1;display:block}
-.managed-job-tools .status-control select{display:block;width:100%;margin-top:6px}
+.status-control .site-filter-select{width:100%;min-width:0}
+.status-control .site-filter-trigger{min-height:42px;height:42px;padding:9px 12px;border-radius:9px;font-size:12px}
+.status-control .site-filter-menu{z-index:75}
+.employer-status-current,.employer-status-select .site-filter-option-label{display:inline-flex;align-items:center;gap:9px}
+.employer-status-icon{display:inline-grid;flex:none;width:21px;height:21px;place-items:center;border:1px solid #cfe4d6;border-radius:50%;background:#e9f4ed;color:#28724d}
+.employer-status-icon svg{display:block;width:13px;height:13px}
+.employer-status-icon-completed{border-color:#efcfca;background:#fff0ee;color:#b8443c}
+.employer-status-select .site-filter-option{justify-content:flex-start}
+.employer-status-select .site-filter-option[aria-selected="true"][data-site-filter-option="completed"],.employer-status-select .site-filter-option[data-site-filter-option="completed"]:hover,.employer-status-select .site-filter-option[data-site-filter-option="completed"]:focus-visible{border-color:#efcfca;background:#fff0ee;color:#a83f38}
+.employer-status-select:has(.site-filter-native option[value="completed"]:checked) .site-filter-trigger{border-color:#d78a82}
+.employer-status-select:has(.site-filter-native option[value="completed"]:checked) [data-site-filter-current]{color:#a83f38}
+html[data-theme="dark"] .employer-status-icon-active{border-color:#41634d;background:#243a2b;color:#8bd5a4}
+html[data-theme="dark"] .employer-status-icon-completed{border-color:#70423d;background:#3b2926;color:#f0a19a}
+html[data-theme="dark"] .employer-status-select .site-filter-option[aria-selected="true"][data-site-filter-option="completed"],html[data-theme="dark"] .employer-status-select .site-filter-option[data-site-filter-option="completed"]:hover,html[data-theme="dark"] .employer-status-select .site-filter-option[data-site-filter-option="completed"]:focus-visible{border-color:#714942;background:#3a2926;color:#f0a19a}
+html[data-theme="dark"] .employer-status-select:has(.site-filter-native option[value="completed"]:checked) .site-filter-trigger{border-color:#87544d}
+html[data-theme="dark"] .employer-status-select:has(.site-filter-native option[value="completed"]:checked) [data-site-filter-current]{color:#f0a19a}
+.managed-job-tools .status-control{grid-column:1/-1}
+.managed-job-tools .status-control .site-filter-select{margin-top:0}
 .job-progress .status-control{margin-top:12px}
 .unavailable-job{margin:15px 0;padding:12px 14px;border-radius:10px;background:#f2f3f1;color:var(--muted);font-size:13px}
 .delete-confirm-backdrop{position:fixed;inset:0;z-index:100;display:grid;place-items:center;padding:20px;background:rgba(17,29,22,.56);backdrop-filter:blur(5px);animation:delete-confirm-fade-in .18s ease-out}
@@ -44,6 +61,6 @@ html[data-theme="dark"] .delete-confirm-action:hover{border-color:#d06b5f;backgr
 @keyframes delete-confirm-fade-in{from{opacity:0}to{opacity:1}}
 @keyframes delete-confirm-rise-in{from{opacity:0;transform:translateY(8px) scale(.985)}to{opacity:1;transform:translateY(0) scale(1)}}
 @media(max-width:900px){.status-counts{grid-template-columns:repeat(3,minmax(0,1fr))}}
-@media(max-width:650px){.status-counts{grid-template-columns:repeat(2,minmax(0,1fr))}.status-counts .stat-card small{font-size:11px}.status-counts .stat-card strong{font-size:20px}.managed-job-tools{grid-template-columns:1fr}.managed-job-tools .btn,.managed-job-tools .status-control{grid-column:1}.status-control select{min-height:46px;width:100%}.status-filter-tabs{gap:6px}.status-filter-tabs a{min-height:42px;display:inline-flex;align-items:center;padding:8px 11px}}
+@media(max-width:650px){.status-counts{grid-template-columns:repeat(2,minmax(0,1fr))}.status-counts .stat-card small{font-size:11px}.status-counts .stat-card strong{font-size:20px}.managed-job-tools{grid-template-columns:1fr}.managed-job-tools .btn,.managed-job-tools .status-control{grid-column:1}.status-control .site-filter-trigger{min-height:46px;height:46px}.status-filter-tabs{gap:6px}.status-filter-tabs a{min-height:42px;display:inline-flex;align-items:center;padding:8px 11px}}
 @media(max-width:480px){.delete-confirm-backdrop{padding:16px}.delete-confirm-dialog{padding:23px 20px;border-radius:17px}.delete-confirm-actions{display:grid;grid-template-columns:1fr 1fr}.delete-confirm-actions .btn{width:100%;min-width:0;padding-inline:10px}}
 @media(prefers-reduced-motion:reduce){.delete-confirm-backdrop,.delete-confirm-dialog{animation:none}}
