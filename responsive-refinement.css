@@ -48,7 +48,6 @@ small,.muted,.hint,.field-hint{color:var(--muted)}
 .rating-inline>span:first-child,.rating-average{color:#8c702f}
 .field input,.field select,.field textarea,.form-shell input,.form-shell select,.form-shell textarea,.schedule-filter-panel input,.schedule-filter-panel select{border-color:#d8e0da;background:#fff;color:#27332c}
 .field input:focus,.field select:focus,.field textarea:focus,.form-shell input:focus,.form-shell select:focus,.form-shell textarea:focus,.schedule-filter-panel input:focus,.schedule-filter-panel select:focus,.category-search input:focus{border-color:#6f9a7d;box-shadow:0 0 0 3px rgba(21,91,69,.11);outline:0}
-.status-candidate_found{background:#f5f0e3;color:#7e641f}
 .status-in_progress{background:#eaf1f4;color:#3f657a}
 .status-completed{background:#f2eae8;color:#8b5048}
 .status-cancelled{background:#eff1ef;color:#657069}

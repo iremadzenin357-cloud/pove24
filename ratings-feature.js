@@ -21,7 +21,7 @@ if (window.DGE_FEATURES?.reviews === false) {
       if (/შეფასებ|რეიტინგ|ვარსკვლავ/.test(element.textContent)) element.remove();
     });
     root.querySelectorAll('.admin-panel p').forEach(paragraph => {
-      if (/შეფასებ/.test(paragraph.textContent)) paragraph.textContent = 'აირჩიე კანდიდატი, რომელიც ამ სამუშაოს შეასრულებს.';
+      if (/შეფასებ/.test(paragraph.textContent)) paragraph.textContent = 'შეფასებების მართვა დროებით გამორთულია.';
     });
     root.querySelectorAll('.admin-activity-row').forEach(row => {
       if (/შეფასებ/.test(row.textContent)) row.remove();

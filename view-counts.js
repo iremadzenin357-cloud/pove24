@@ -15,8 +15,7 @@ function recordListingView(kind,id,owner){
  if(listingViewsSeen.has(seenKey))return;
  listingViewsSeen.add(seenKey);
  try{sessionStorage.setItem(listingViewSessionKey,JSON.stringify([...listingViewsSeen]))}catch{}
- listingViewCounts[kind][key]=listingViewCount(kind,key)+1;
- try{set(listingViewStoreKey,listingViewCounts)}catch{}
+ if(window.Pove24Store){window.Pove24Store.recordView(kind,key).then(count=>{if(count==null)return;listingViewCounts[kind][key]=count;document.querySelectorAll('.listing-view-count').forEach(node=>{const text=node.querySelector('span');if(text)text.textContent=count+' ნახვა';node.title=count+' ნახვა';node.setAttribute('aria-label',count+' ნახვა')})}).catch(error=>console.warn('[Pove24] View count update failed:',error))}
 }
 function listingViewBadge(kind,id,extraClass=''){
  const count=listingViewCount(kind,id);

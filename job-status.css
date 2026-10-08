@@ -14,12 +14,9 @@
 .worker-profile-tools{grid-template-columns:1fr;margin-top:14px;padding-top:12px}
 .managed-job-tools{display:grid;grid-template-columns:1fr auto;align-items:center;gap:8px;margin-top:auto;padding-top:13px;border-top:1px solid var(--line)}
 .job-status-chip{display:inline-flex;align-items:center;width:max-content;max-width:100%;padding:6px 10px;border-radius:999px;background:#edf3ee;color:#42624d;font-size:12px;font-weight:650}
-.status-candidate_found{background:#f6f0df;color:#86631f}
 .status-in_progress{background:#eaf1f5;color:#42687d}
 .status-completed{background:#f3eae8;color:#92534c}
 .status-cancelled{background:#f0f1ef;color:#737c75}
-.applicant-count{font-size:12px;color:var(--muted)}
-.applicant-count strong{font-size:13px;color:var(--ink)}
 .managed-job-tools .btn{grid-column:1/-1;width:100%}
 .managed-job-tools .delete-job-btn{border-color:#ead1ce;background:#fff;color:#a4473e}
 .managed-job-tools .delete-job-btn:hover{border-color:#d8aaa4;background:#fbefed;color:#8d332b}

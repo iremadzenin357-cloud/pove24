@@ -22,7 +22,7 @@ details = function (jobId) {
   const wrapper = document.createElement('div');
   wrapper.innerHTML = html;
   wrapper.querySelectorAll(
-    '[data-apply], [data-save], [data-contact], [data-reveal-job-phone], [data-open-chat], [data-open-report][data-report-job]'
+    '[data-save], [data-contact], [data-reveal-job-phone], [data-open-report][data-report-job]'
   ).forEach(button => button.remove());
 
   const profileBox = wrapper.querySelector('.profile-box');
@@ -36,15 +36,13 @@ details = function (jobId) {
 /* Also block these actions if a stale or manually restored button remains in the page. */
 document.addEventListener('click', event => {
   const button = event.target.closest(
-    '[data-apply], [data-save], [data-contact], [data-reveal-job-phone], [data-open-chat], [data-open-report][data-report-job]'
+    '[data-save], [data-contact], [data-reveal-job-phone], [data-open-report][data-report-job]'
   );
   if (!button) return;
 
-  const jobId = button.dataset.apply
-    || button.dataset.save
+  const jobId = button.dataset.save
     || button.dataset.contact
     || button.dataset.revealJobPhone
-    || button.dataset.openChat
     || button.dataset.reportJob;
   if (!isOwnJob(jobId)) return;
 
