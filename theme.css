@@ -282,7 +282,7 @@ html[data-theme="dark"] #how .how-item p{color:#c2cdc5}
 @media(max-width:900px){#how .how-grid{grid-template-columns:repeat(2,minmax(0,1fr));gap:20px}#how .how-item{min-height:220px;padding:24px}}
 @media(max-width:620px){#how .section-heading{margin-bottom:24px}#how .section-heading h2{font-size:28px}#how .section-heading p{font-size:14px}#how .how-grid{grid-template-columns:1fr;grid-auto-rows:auto;gap:14px}#how .how-item{min-height:0;padding:22px}#how .step{margin-bottom:17px}#how .how-item h3{font-size:20px;margin-bottom:8px}#how .how-item p{font-size:16px;line-height:1.65}}
 @media(prefers-reduced-motion:reduce){#how .how-item{transition:none}#how .how-item:hover{transform:none}}
-html.theme-transition,html.theme-transition *,html.theme-transition *::before,html.theme-transition *::after{transition-property:background-color,color,border-color,box-shadow!important;transition-duration:.2s!important;transition-timing-function:ease!important}
+html.theme-switching,html.theme-switching *,html.theme-switching *::before,html.theme-switching *::after{transition:none!important}
 @media(max-width:767px){body,.theme-toggle,html.theme-transition,html.theme-transition *,html.theme-transition *::before,html.theme-transition *::after{transition-duration:0s!important}}
 @media(prefers-reduced-motion:reduce){body,.theme-toggle,html.theme-transition *,html.theme-transition *::before,html.theme-transition *::after{transition-duration:0s!important}}
 @media(max-width:360px){.theme-toggle{width:42px;min-width:42px;padding:0}}

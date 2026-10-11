@@ -9,7 +9,7 @@
       #jobResults .job-search-results-grid>.job-card>.card-top{justify-content:space-between;align-items:flex-start;gap:10px}
       #jobResults .job-search-results-grid>.job-card>.card-top>.job-category-stack{display:flex;flex:1 1 auto;min-width:0;flex-direction:column;align-items:flex-start;gap:5px}
       #jobResults .job-search-results-grid>.job-card>.card-top>.job-category-stack>.pill{max-width:100%;white-space:normal;overflow-wrap:anywhere;line-height:1.45}
-      #jobResults .job-search-results-grid>.job-card>.card-top>.job-category-stack>.pill-sub{display:none}
+      #jobResults .job-search-results-grid>.job-card>.card-top>.job-category-stack>.pill-sub{display:inline-flex}
       #jobResults .job-search-results-grid>.job-card>.card-top>[data-save]{flex:0 0 auto;margin:0 0 0 auto}
     `;
     document.head.append(style);
@@ -41,6 +41,18 @@
         categoryStack.className = 'job-category-stack';
         top.querySelectorAll(':scope > .pill').forEach(pill => categoryStack.append(pill));
         top.prepend(categoryStack);
+      }
+
+      if (job) {
+        const selections = Array.isArray(job.categorySelections) && job.categorySelections.length
+          ? job.categorySelections : [{ main: job.category, sub: job.subcategory }];
+        const labels = [...new Set(selections.map(entry => String(entry.main || job.category || '').trim()).filter(Boolean))];
+        categoryStack.replaceChildren(...labels.map(label => {
+          const pill = document.createElement('span');
+          pill.className = 'pill';
+          pill.textContent = label;
+          return pill;
+        }));
       }
 
       if (isOwnJob) return;

@@ -500,7 +500,6 @@ input:focus::placeholder,textarea:focus::placeholder{opacity:0!important}
 .worker-card .rating-inline{justify-content:center;width:fit-content;max-width:100%;margin:8px auto 7px;padding:5px 10px;border:1px solid #e8eee9;border-radius:8px;background:#f8faf8;color:#526158;font-size:13px;font-weight:550;line-height:1.5}
 .worker-card .rating-empty{color:#526158;font-size:13px}
 .worker-card>p:first-of-type{font-size:14.5px;color:#43564a}
-.worker-card>p:first-of-type::first-letter{color:#1d704e;font-size:17px}
 .worker-card .skill{padding:6px 12px;font-size:13px}
 .worker-card>.worker-stats{font-size:12.5px;color:#4f5d54}
 .worker-card>.worker-stats strong{font-size:17px}

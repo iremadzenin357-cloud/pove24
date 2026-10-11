@@ -1,0 +1,39 @@
+/* Shared optional photo component; scoped to listing forms only. */
+html body.pv-redesign .listing-photo-field{margin:20px 0 8px;padding:0;min-width:0;border:0;background:none;box-shadow:none}
+.listing-photo-field .listing-photo-heading{display:flex;align-items:center;justify-content:space-between;gap:12px;margin-bottom:12px}
+.listing-photo-field .listing-photo-heading strong{font-size:14px;color:var(--pv-text);font-weight:700}
+.listing-photo-field .listing-photo-heading>span{font-size:11px;color:var(--pv-muted)}
+html body.pv-redesign .listing-photo-field .listing-photo-pick{position:relative;display:flex;align-items:center;gap:14px;margin:0;padding:22px 18px;border:1px dashed var(--pv-line);border-radius:14px;background:var(--pv-surface-alt);color:var(--pv-text);cursor:pointer;min-width:0;font-weight:400}
+.listing-photo-field .listing-photo-pick:hover{border-color:var(--pv-text)}
+.listing-photo-field .listing-photo-pick:focus-within{outline:2px solid var(--pv-text);outline-offset:3px}
+html body.pv-redesign .listing-photo-field .listing-photo-native{position:absolute!important;width:1px!important;height:1px!important;margin:-1px!important;padding:0!important;overflow:hidden!important;clip:rect(0,0,0,0)!important;clip-path:inset(50%)!important;white-space:nowrap!important;border:0!important;min-height:0!important}
+.listing-photo-field .listing-photo-icon{display:grid;place-items:center;flex:0 0 42px;width:42px;height:42px;border:1px solid var(--pv-line);border-radius:12px;background:var(--pv-surface);color:var(--pv-text)}
+.listing-photo-field .listing-photo-icon svg{width:23px;height:23px}
+.listing-photo-field .listing-photo-copy{display:flex;flex:1;flex-direction:column;gap:5px;min-width:0}
+.listing-photo-field .listing-photo-copy strong{font-size:14px;line-height:1.5}
+.listing-photo-field .listing-photo-copy>span{font-size:11px;line-height:1.7;color:var(--pv-muted)}
+.listing-photo-field .listing-photo-select{display:flex;align-items:center;justify-content:center;min-height:44px;padding:10px 15px;border:1px solid #215b48;border-radius:10px;background:#184d3e;color:#fff;font-size:12px;font-weight:600;line-height:1.6;white-space:nowrap}
+.listing-photo-field .listing-photo-pick[data-disabled=true]{cursor:default;opacity:.65}
+.listing-photo-field .listing-photo-meta{display:flex;align-items:baseline;justify-content:space-between;gap:10px;margin:10px 0;color:var(--pv-muted);font-size:11px;line-height:1.6}
+.listing-photo-field [data-listing-photo-count]{white-space:nowrap;font-variant-numeric:tabular-nums;color:var(--pv-text)}
+.listing-photo-field .listing-photo-previews{display:grid;grid-template-columns:repeat(5,minmax(0,1fr));gap:10px;min-width:0}
+.listing-photo-field .listing-photo-preview{position:relative;min-width:0;border:1px solid var(--pv-line);border-radius:12px;overflow:hidden;display:grid;place-items:center;background:var(--pv-surface-alt)}
+.listing-photo-field .listing-photo-preview img{display:block;width:100%;height:100%;object-fit:contain}
+.listing-photo-field .listing-photo-preview .listing-photo-remove{position:absolute;right:3px;top:3px;display:grid;place-items:center;width:44px;height:44px;min-height:44px;padding:0;border:1px solid var(--pv-line);border-radius:10px;background:var(--pv-surface);color:var(--pv-text);font-size:25px;line-height:1;cursor:pointer;box-shadow:0 1px 3px #0001}
+.listing-photo-field .listing-photo-preview button:focus-visible{outline:2px solid var(--pv-text);outline-offset:-3px}
+.listing-photo-field .listing-photo-status{min-height:20px;margin:8px 0 0;font-size:12px;line-height:1.7;color:var(--pv-muted);overflow-wrap:anywhere}
+@media(max-width:640px){html body.pv-redesign .listing-photo-field .listing-photo-pick{flex-wrap:wrap;padding:18px 14px;gap:12px}.listing-photo-field .listing-photo-select{flex-basis:100%;width:100%;box-sizing:border-box}.listing-photo-field .listing-photo-copy>span{font-size:10px}.listing-photo-field .listing-photo-previews{grid-template-columns:repeat(3,minmax(0,1fr));gap:8px}.listing-photo-field .listing-photo-meta{font-size:10px}.listing-photo-field .listing-photo-heading strong{font-size:13px}}
+
+/* Position zero is the first photo; controls remain outside the image/remove target. */
+.listing-photo-field .listing-photo-preview{display:flex;flex-direction:column;align-self:start}
+.listing-photo-field .listing-photo-media{position:relative;aspect-ratio:1;min-width:0;width:100%;display:grid;place-items:center;overflow:hidden}
+.listing-photo-field .listing-photo-preview.is-first{border-color:#28624e;box-shadow:0 0 0 1px #28624e}
+.listing-photo-field .listing-photo-first,.listing-photo-field .listing-photo-set-first{box-sizing:border-box;width:100%;min-height:48px;display:flex;align-items:center;justify-content:center;gap:4px;padding:6px 4px;font-size:10px;line-height:1.5;text-align:center;color:var(--pv-text);background:var(--pv-surface);border:0;border-top:1px solid var(--pv-line);border-radius:0;font-weight:600;overflow-wrap:anywhere}
+.listing-photo-field .listing-photo-first{background:var(--pv-surface-alt)}
+.listing-photo-field .listing-photo-first>span:first-child{flex-shrink:0;color:var(--pv-text)}
+.listing-photo-field .listing-photo-set-first{cursor:pointer;white-space:normal}
+.listing-photo-field .listing-photo-set-first:hover{background:var(--pv-surface-alt)}
+.listing-photo-field .listing-photo-set-first:disabled{cursor:default;opacity:.6}
+.listing-photo-field .listing-photo-reorder{display:flex;width:100%;border-top:1px solid var(--pv-line)}
+.listing-photo-field .listing-photo-reorder button{flex:1;min-height:36px;border:0;background:var(--pv-surface);color:var(--pv-text);cursor:pointer;font-size:18px}
+.listing-photo-field .listing-photo-reorder button:disabled{opacity:.35;cursor:default}

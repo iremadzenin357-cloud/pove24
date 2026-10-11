@@ -22,7 +22,6 @@
   const setCurrentUser = async () => {
     if (refreshInProgress) return refreshInProgress;
     refreshInProgress = window.Pove24Store.refreshSession()
-      .then(() => window.Pove24AppBridge?.hydrate())
       .finally(() => { refreshInProgress = null; });
     return refreshInProgress;
   };
@@ -135,7 +134,7 @@
     const app = document.getElementById('app');
     if (!app) return;
     app.innerHTML = '<section class="auth-screen"><div class="auth-card auth-card-login">'
-      + '<a class="auth-brand" href="#/"><span>Pove24.com</span></a>'
+      + '<a class="auth-brand" href="#/"><span>Pove.me</span></a>'
       + '<h1>ახალი პაროლი</h1><p class="auth-intro">შეიყვანე ახალი პაროლი.</p>'
       + '<form data-password-reset><div class="field auth-field"><label for="new-password">ახალი პაროლი</label>'
       + '<input id="new-password" name="password" type="password" minlength="8" required autocomplete="new-password"></div>'
@@ -175,12 +174,16 @@
     }
   }, true);
 
-  supabase.auth.onAuthStateChange(event => {
+  supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
       setTimeout(showPasswordRecovery, 0);
       return;
     }
     if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+      // Supabase also emits SIGNED_IN when an existing session regains focus.
+      // Keep the mounted form (including files and scroll position) in that case.
+      if (event === 'SIGNED_IN' && session?.user?.id &&
+          session.user.id === window.Pove24Store.accountRef()) return;
       setTimeout(() => setCurrentUser().catch(error => console.error('[Pove24] Auth refresh failed:', error)), 0);
     }
   });

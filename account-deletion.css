@@ -1,0 +1,12 @@
+.account-deletion-card { margin-top: 24px; }
+.account-deletion-card h2 { margin-bottom: 12px; }
+.account-deletion-card p { margin-bottom: 18px; }
+.account-deletion-dialog { width: min(540px, calc(100vw - 32px)); max-height: calc(100dvh - 40px); overflow: auto; padding: 28px; border: 1px solid #d3dccd; border-radius: 20px; color: #173f35; background: #fffef9; }
+.account-deletion-dialog::backdrop { background: rgb(13 34 28 / 65%); }
+.account-deletion-dialog h2 { margin: 0 0 16px; }
+.account-deletion-dialog p { margin: 14px 0; line-height: 1.7; overflow-wrap: anywhere; }
+.account-deletion-dialog .field { margin: 16px 0; }
+.account-deletion-dialog [hidden] { display: none; }
+.account-deletion-dialog [data-delete-status] { font-size: 14px; }
+.account-deletion-dialog button { margin: 6px 0; }
+[data-theme="dark"] .account-deletion-dialog { color: #e8efd9; background: #142d25; border-color: #496451; }

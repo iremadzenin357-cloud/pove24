@@ -4,8 +4,8 @@ function isOwnJob(jobId) {
 }
 
 const jobCardWithOwnerActions = jobCard;
-jobCard = function (job) {
-  let html = jobCardWithOwnerActions(job);
+jobCard = function (job, options = {}) {
+  let html = jobCardWithOwnerActions(job, options);
   if (!user || job.owner !== user.email) return html;
 
   const wrapper = document.createElement('div');

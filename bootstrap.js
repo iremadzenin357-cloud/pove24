@@ -44,7 +44,11 @@
     'app.js?v=20261008-seamless-startup-v1',
     'flow.js?v=20261008-seamless-startup-v1',
     'geo-ui.js?v=20261008-home-search-actions-v2',
+    'design-home.js?v=20261008-redesign',
     'ratings.js?v=20261008-features-off',
+    'listing-photos-core.js?v=20261011-photo-completion-v3',
+    'listing-photos.js?v=20261011-photo-completion-v3',
+    'detail-gallery.js?v=20261011-infrastructure-fixes-v2',
     'schedule.js?v=20261008-worker-experience-duration-inline-validation-v2',
     'social.js?v=20261008-features-off',
     'job-status.js?v=20261008-status-icons-check-cross',
@@ -59,13 +63,15 @@
     'georgian-validation.js',
     'owner-listing-actions.js?v=20261008-features-off',
     'ratings-feature.js?v=20261008-features-off',
-    'theme.js?v=20260930-dark-mode',
     'job-search-save.js?v=20260930-hide-search-subcategory',
     'view-counts.js?v=20261008-job-status-placement',
     'worker-search-filters.js?v=20261007-worker-city-area',
     'listing-pagination.js?v=20261008-status-group-order',
     'home-listing-types.js?v=20261008-active-home-jobs',
-    'navigation-performance.js?v=20261008-seamless-startup-v1'
+    'navigation-performance.js?v=20261008-seamless-startup-v1',
+    'design-interactions.js?v=20261008-redesign',
+    'photo-moderation.js?v=20261011-infrastructure-fixes-v2',
+    'account-deletion.js?v=20261011-local-v1'
   ];
 
   function loadScriptsInOrder(sources, continueOnError = false) {

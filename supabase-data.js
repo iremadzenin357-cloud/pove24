@@ -141,11 +141,19 @@
       optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
       optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
     ]);
+    // Display rename keeps the existing category UUID and historical links intact.
+    categoryRows.forEach(row => { if (row.name === 'ღონისძიებები') row.name = 'ღონისძიებები და ორგანიზება'; });
+    categoryRows.forEach(row => { if (row.name === 'ონლაინ / კომპიუტერული') row.name = 'კომპიუტერული მომსახურება'; });
     categoryIds.clear();
     subcategoryIds.clear();
+    const transportId = categoryRows.find(row => row.name === 'მიტანა და გადაადგილება')?.id;
+    subcategoryRows.forEach(row => { if (row.category_id === transportId && row.name === 'მანქანით დახმარება') row.name = 'მძღოლით/მანქანით დახმარება'; });
     categoryRows.filter(row => row.is_active).forEach(row => categoryIds.set(row.name, row.id));
-    subcategoryRows.filter(row => row.is_active).forEach(row => {
+    if (categoryIds.has('ღონისძიებები და ორგანიზება')) categoryIds.set('ღონისძიებები', categoryIds.get('ღონისძიებები და ორგანიზება'));
+    if (categoryIds.has('კომპიუტერული მომსახურება')) categoryIds.set('ონლაინ / კომპიუტერული', categoryIds.get('კომპიუტერული მომსახურება'));
+    subcategoryRows.filter(row => row.is_active || ['ღონისძიების დამხმარე','ქორწილის დამხმარე','სერვირების დამხმარე','უთოობა','ტანსაცმლის დალაგება','მძღოლი ერთი დღით'].includes(row.name)).forEach(row => {
       subcategoryIds.set(row.category_id + '|' + row.name, row.id);
+      if (row.category_id === transportId && row.name === 'მძღოლით/მანქანით დახმარება') subcategoryIds.set(row.category_id + '|მანქანით დახმარება', row.id);
     });
 
     const categoryById = new Map(categoryRows.map(row => [row.id, row]));
@@ -175,7 +183,8 @@
 
     const jobs = rawJobs.map(row => {
       const selections = jobLinkMap.get(row.id) || [];
-      const created = Date.parse(row.created_at || row.posted_at) || Date.now();
+      // Missing publication time must not make an old job look newly published.
+      const created = Date.parse(row.created_at) || 0;
       return {
         id: row.legacy_id || row.id, uuid: row.id, legacyId: row.legacy_id,
         createdAt: created, updatedAt: Date.parse(row.updated_at) || created,
@@ -473,10 +482,10 @@
     return (Array.isArray(next) ? next : []).filter(row => before.get(keyOf(row)) !== JSON.stringify(row));
   }
 
-  async function saveListing(table, row, existingId) {
+  async function saveListing(table, row, existingId, pendingId) {
     const query = existingId
       ? client.from(table).update(row).eq('id', existingId)
-      : client.from(table).insert(row);
+      : pendingId ? client.from(table).upsert({ ...row, id: pendingId }, { onConflict: 'id' }) : client.from(table).insert(row);
     return run(query.select('id,legacy_id').single());
   }
 
@@ -513,7 +522,7 @@
       display_name: String(job.name || cache.get('dge-user')?.name || 'მომხმარებელი').trim(),
       posted_at: stamp(job.createdAt || job.postedAt)
     };
-    const saved = await saveListing('job_posts', row, oldUuid);
+    const saved = await saveListing('job_posts', row, oldUuid, job.pendingUuid);
     ids.jobs.set(String(job.id), saved.id);
     job.uuid = saved.id;
     const contact = String(job.phone || '').trim();
@@ -541,7 +550,7 @@
       avatar_path: worker.avatarUrl || worker.profilePhoto || (sameUser(worker.owner) ? cache.get('dge-user')?.profilePhoto : null) || null,
       status: worker.status || 'published'
     };
-    const saved = await saveListing('worker_profiles', row, worker.uuid || ids.workers.get(String(worker.id)) || null);
+    const saved = await saveListing('worker_profiles', row, worker.uuid || ids.workers.get(String(worker.id)) || null, worker.pendingUuid);
     ids.workers.set(String(worker.id), saved.id);
     worker.uuid = saved.id;
     const contact = String(worker.phone || '').trim();
@@ -725,6 +734,21 @@
   }
 
   window.Pove24Store = {
+    async saveFormListing(kind, row) {
+      if (!authUser || !sameUser(row.owner)) throw new Error('ამ განცხადების შეცვლის უფლება არ გაქვს.');
+      if (kind !== 'jobs' && kind !== 'workers') throw new Error('არასწორი განცხადების ტიპი.');
+      await flush();
+      const key = kind === 'jobs' ? 'dge-jobs' : 'dge-workers';
+      const existing = (cache.get(key) || []).find(item => String(item.id) === String(row.id));
+      if (existing && !sameUser(existing.owner)) throw new Error('ამ განცხადების შეცვლის უფლება არ გაქვს.');
+      await (kind === 'jobs' ? upsertJob(row) : upsertWorker(row));
+      const rows = [...(cache.get(key) || [])];
+      const index = rows.findIndex(item => String(item.id) === String(row.id));
+      if (index < 0) rows.unshift(row); else rows[index] = row;
+      setCache(key, rows);
+      return row;
+    },
+    validateCategorySelections,
     initialize, waitUntilReady, refreshSession, flush, get, set, accountRef, sameUser,
     resolveId, lookupProfileId, isAdmin, get client() { return client; },
     get authUser() { return authUser; }, get profile() { return profile; },
@@ -798,3 +822,7 @@
     if (typeof window.notify === 'function') window.notify('მონაცემის შენახვა ვერ მოხერხდა. სცადე ხელახლა.');
   });
 })();
+
+
+
+
