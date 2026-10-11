@@ -1,0 +1,12 @@
+import {readFileSync, writeFileSync} from 'node:fs';
+import {dirname, join} from 'node:path';
+import {fileURLToPath} from 'node:url';
+const root=dirname(fileURLToPath(import.meta.url));
+const styles=['style.css','flow.css','geo-ui.css','ratings.css','schedule.css','social.css','job-status.css','admin.css','polish.css','ui-icons.css','responsive-refinement.css','profile-media.css','how-menu.css','profile-social.css','view-counts.css','worker-search-filters.css','auth-ui.css','theme.css','mobile-first.css','listing-pagination.css','schedule-mobile-filters.css','phone-validation.css','startup.css','design.css','interior-design.css','listing-photos.css','detail-gallery.css'];
+const bundle=styles.map(name=>'/* '+name+' */\n'+readFileSync(join(root,name),'utf8').trim()).join('\n\n')+'\n';
+writeFileSync(join(root,'site.css'),bundle);
+let index=readFileSync(join(root,'index.html'),'utf8');
+const home=readFileSync(join(root,'home-template.html'),'utf8').trim();
+index=index.replace(/(<main id="app"[^>]*>)[\s\S]*?(<\/main>)/,'$1\n'+home+'\n$2');
+writeFileSync(join(root,'index.html'),index);
+console.log('Built site.css ('+Buffer.byteLength(bundle)+' bytes) and synchronized static homepage.');

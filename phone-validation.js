@@ -174,7 +174,7 @@
 
     const prefix = document.createElement('span');
     prefix.className = 'georgian-phone-prefix';
-    prefix.innerHTML = '<span class="georgian-phone-flag" aria-hidden="true">🇬🇪</span><span>+995</span>';
+    prefix.innerHTML = '<span class="georgian-phone-flag" aria-hidden="true"><svg viewBox="0 0 30 20" xmlns="http://www.w3.org/2000/svg"><path fill="#fff" d="M0 0h30v20H0z"/><path fill="#c83d42" d="M13 0h4v20h-4zM0 8h30v4H0zM5 2h2v4H5zM4 3h4v2H4zM23 2h2v4h-2zM22 3h4v2h-4zM5 14h2v4H5zM4 15h4v2H4zM23 14h2v4h-2zM22 15h4v2h-4z"/></svg></span><span>+995</span>';
 
     input.type = 'tel';
     input.inputMode = 'numeric';

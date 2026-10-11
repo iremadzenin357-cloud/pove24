@@ -2,6 +2,8 @@
   const supabase = window.pove24Supabase;
   if (!supabase) return;
   let recoveryMode = false;
+  let appReady = false;
+  let savingPassword = false;
   let refreshInProgress = null;
 
   const showMessage = (message, isError = false) => {
@@ -22,7 +24,6 @@
   const setCurrentUser = async () => {
     if (refreshInProgress) return refreshInProgress;
     refreshInProgress = window.Pove24Store.refreshSession()
-      .then(() => window.Pove24AppBridge?.hydrate())
       .finally(() => { refreshInProgress = null; });
     return refreshInProgress;
   };
@@ -122,20 +123,26 @@
       showMessage('პაროლის აღსადგენად მიუთითე ელფოსტა.', true);
       return;
     }
-    const { error } = await supabase.auth.resetPasswordForEmail(email, {
-      redirectTo: window.location.origin + window.location.pathname
-    });
-    if (error) showMessage(errorText(error), true);
-    else showMessage('პაროლის აღდგენის ბმული ელფოსტაზე გამოგიგზავნეთ.');
+    button.disabled = true;
+    try {
+      const { error } = await supabase.auth.resetPasswordForEmail(email, {
+        redirectTo: window.location.origin + '/#/login?recovery=1'
+      });
+      if (error) throw error;
+      showMessage('პაროლის აღდგენის ბმული ელფოსტაზე გამოგიგზავნეთ.');
+    } catch (error) {
+      showMessage(errorText(error), true);
+    } finally { button.disabled = false; }
   }
 
   function showPasswordRecovery() {
-    if (recoveryMode) return;
-    recoveryMode = true;
+    if (!appReady) return;
     const app = document.getElementById('app');
     if (!app) return;
+    recoveryMode = true;
+    history.replaceState(history.state, '', '/#/login?recovery=1');
     app.innerHTML = '<section class="auth-screen"><div class="auth-card auth-card-login">'
-      + '<a class="auth-brand" href="#/"><span>Pove24.com</span></a>'
+      + '<a class="auth-brand" href="#/"><span>Pove.me</span></a>'
       + '<h1>ახალი პაროლი</h1><p class="auth-intro">შეიყვანე ახალი პაროლი.</p>'
       + '<form data-password-reset><div class="field auth-field"><label for="new-password">ახალი პაროლი</label>'
       + '<input id="new-password" name="password" type="password" minlength="8" required autocomplete="new-password"></div>'
@@ -151,12 +158,22 @@
     event.stopImmediatePropagation();
     const password = String(new FormData(reset).get('password') || '');
     if (password.length < 8) return showMessage('პაროლი მინიმუმ 8 სიმბოლოს უნდა შეიცავდეს.', true);
-    const { error } = await supabase.auth.updateUser({ password });
-    if (error) return showMessage(errorText(error), true);
-    recoveryMode = false;
-    await setCurrentUser();
-    if (typeof notify === 'function') notify('პაროლი შეიცვალა.');
-    location.hash = '#/dashboard';
+    if (savingPassword) return;
+    savingPassword = true;
+    const button = reset.querySelector('[type="submit"]');
+    if (button) button.disabled = true;
+    try {
+      const { data, error: sessionError } = await supabase.auth.getSession();
+      if (sessionError || !data?.session || !recoveryMode) throw new Error('აღდგენის სესია დასრულებულია. მოითხოვე ახალი ბმული.');
+      const { error } = await supabase.auth.updateUser({ password });
+      if (error) throw error;
+      recoveryMode = false;
+      window.pove24RecoveryPending = false;
+      await setCurrentUser();
+      if (typeof notify === 'function') notify('პაროლი შეიცვალა.');
+      location.hash = '#/dashboard';
+    } catch (error) { showMessage(errorText(error), true); }
+    finally { savingPassword = false; if (button?.isConnected) button.disabled = false; }
   }, true);
 
   document.addEventListener('submit', handleAuthSubmit, true);
@@ -175,13 +192,41 @@
     }
   }, true);
 
-  supabase.auth.onAuthStateChange(event => {
+  supabase.auth.onAuthStateChange((event, session) => {
     if (event === 'PASSWORD_RECOVERY') {
+      window.pove24RecoveryPending = true;
       setTimeout(showPasswordRecovery, 0);
       return;
     }
     if (event === 'SIGNED_IN' || event === 'SIGNED_OUT' || event === 'USER_UPDATED') {
+      // Supabase also emits SIGNED_IN when an existing session regains focus.
+      // Keep the mounted form (including files and scroll position) in that case.
+      if (event === 'SIGNED_IN' && session?.user?.id &&
+          session.user.id === window.Pove24Store.accountRef()) return;
       setTimeout(() => setCurrentUser().catch(error => console.error('[Pove24] Auth refresh failed:', error)), 0);
     }
   });
+  window.Pove24Auth = {
+    async ready() {
+      appReady = true;
+      const previousRoute = window.routeView;
+      if (typeof previousRoute === 'function') {
+        window.routeView = function (...args) {
+          if (recoveryMode && location.hash === '#/login?recovery=1') return showPasswordRecovery();
+          recoveryMode = false;
+          return previousRoute.apply(this, args);
+        };
+      }
+      // Existing login route hosts recovery; no separate reset route is invented.
+      const requested = location.hash === '#/login?recovery=1';
+      if (!window.pove24RecoveryPending && !requested) return;
+      const { data, error } = await supabase.auth.getSession();
+      if (error || !data?.session) {
+        window.pove24RecoveryPending = false;
+        showMessage('აღდგენის ბმული ვადაგასულია ან არასწორია. მოითხოვე ახალი ბმული.', true);
+        return;
+      }
+      showPasswordRecovery();
+    }
+  };
 })();

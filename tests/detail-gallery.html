@@ -1,0 +1,33 @@
+<!doctype html><html lang="ka"><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1"><link rel="stylesheet" href="../site.css"><style>body{padding:24px;background:#f6f5ed;color:#194d3c}main{max-width:800px;margin:auto}.fixture-card{padding:24px;border-radius:18px;background:#fffef8}h1{font-size:26px}#results{white-space:pre-wrap;font:13px/1.6 monospace}iframe{display:block;border:0;margin-bottom:12px}</style><main><h1>ფოტოგალერეა — ადგილობრივი მაგალითი</h1><p>საცდელი ფოტოები; ბაზასთან კავშირი არ გამოიყენება.</p><div id="demo" class="fixture-card"></div><pre id="results">მოწმდება…</pre><div id="responsive"></div></main><script src="../detail-gallery.js"></script><script>
+const params=new URLSearchParams(location.search),count=Number(params.get('count')||5);
+const photos=n=>Array.from({length:n},(_,i)=>({id:'p'+i,position:i,getUrl:async()=>new URL('photo-'+(i+1)+'.png',location.href).href}));
+const demo=PoveDetailGallery.create(document.getElementById('demo'),photos(count));
+const sleep=ms=>new Promise(r=>setTimeout(r,ms));
+if(params.has('embed')){document.querySelector('h1').remove();document.querySelector('p').remove();document.getElementById('results').remove();document.body.style.padding='12px';}
+else (async()=>{
+ const results=[];const check=(condition,name)=>{results.push((condition?'PASS ':'FAIL ')+name);if(!condition)throw Error(name);};
+ const host=document.createElement('div');document.body.append(host);
+ try{
+ for(const kind of ['jobs','workers'])for(const n of [0,1,2,5]){
+ host.replaceChildren();const g=PoveDetailGallery.create(host,photos(n));check(n===0?!host.children.length:!!g,kind+' count '+n);if(n)check(host.querySelectorAll('.pv-gallery-thumb').length===(n>1?n:0),kind+' thumbnail count '+n);
+ }
+ host.replaceChildren();const reversed=photos(5).reverse();const g=PoveDetailGallery.create(host,reversed);check(g.selected===0,'saved position order initial');await sleep(80);check(host.querySelector('.pv-gallery-main img').src.endsWith('photo-1.png'),'position zero displayed first');
+ host.querySelectorAll('.pv-gallery-thumb')[2].click();check(g.selected===2,'thumbnail selection');
+ const main=host.querySelector('.pv-gallery-main');main.focus();main.click();let d=document.querySelector('dialog');check(d.open,'fullscreen dialog opened');check(document.body.style.position==='fixed','background scroll locked');
+ d.querySelector('.pv-viewer-next').click();check(g.selected===3,'next');d.querySelector('.pv-viewer-prev').click();check(g.selected===2,'previous');
+ d.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowRight',bubbles:true}));check(g.selected===3,'ArrowRight');d.dispatchEvent(new KeyboardEvent('keydown',{key:'ArrowLeft',bubbles:true}));check(g.selected===2,'ArrowLeft');
+ const stage=d.querySelector('.pv-viewer-stage');const touch=(type,x,y)=>{const e=new Event(type,{bubbles:true});Object.defineProperty(e,type==='touchstart'?'touches':'changedTouches',{value:[{clientX:x,clientY:y}]});stage.dispatchEvent(e);};touch('touchstart',220,80);touch('touchend',100,84);check(g.selected===3,'mobile swipe left');touch('touchstart',100,80);touch('touchend',220,84);check(g.selected===2,'mobile swipe right');
+ d.dispatchEvent(new KeyboardEvent('keydown',{key:'Escape',bubbles:true}));check(!document.querySelector('dialog'),'Escape closes');check(document.activeElement===main,'keyboard focus restored');check(document.body.style.position!=='fixed','scroll unlocked');
+ host.replaceChildren();PoveDetailGallery.create(host,photos(1));host.querySelector('button').click();check(!document.querySelector('.pv-viewer-next'),'single photo has no arrows');document.querySelector('.pv-viewer-close').click();
+ host.replaceChildren();PoveDetailGallery.create(host,[{position:0,getUrl:async()=>new URL('missing-photo.png',location.href).href}]);await sleep(180);check(host.querySelector('.pv-gallery-status').textContent==='ფოტო მიუწვდომელია','broken image message');
+ const calls=[];window.Pove24Store={accountRef:()=>null,client:{from:name=>{calls.push(name);const q={select:s=>(calls.push(s),q),eq:(k,v)=>(calls.push([k,v]),q),order:(k,v)=>(calls.push([k,v]),q),limit:async()=>({data:[{id:'p',position:0,storage_path:'owner/p.webp'}]})};return q;}}};window.PoveListingPhotoCore={repository:()=>({preview:async path=>'https://example.test/'+path})};
+ for(const kind of ['jobs','workers']){const list=await PoveDetailGallery.loadPhotos(kind,'id');check(list.length===1,'authorized retrieval adapter '+kind);check(calls.some(c=>Array.isArray(c)&&c[0]===(kind==='jobs'?'job_post_id':'worker_profile_id')),'parent scope '+kind);}
+ check(calls.some(c=>Array.isArray(c)&&c[0]==='position'),'server position ordering');
+ host.remove();
+ for(const width of [320,375,430,768,1280]){
+ const frame=document.createElement('iframe');frame.width=width;frame.height=650;frame.src='detail-gallery.html?embed=1';document.getElementById('responsive').append(frame);await new Promise(r=>frame.onload=r);const doc=frame.contentDocument;
+ check(doc.documentElement.scrollWidth<=width,'no overflow '+width);const thumbs=[...doc.querySelectorAll('.pv-gallery-thumb')];check(thumbs.every(t=>t.getBoundingClientRect().width>=44),'touch targets '+width);check(doc.querySelector('.pv-gallery-main').getBoundingClientRect().height<=(width<=430?300:430),'bounded image height '+width);frame.remove();
+ }
+ }catch(error){results.push('ERROR '+error.message);}finally{host.remove();document.getElementById('results').textContent=results.join('\n');document.title=results.some(x=>/^(FAIL|ERROR)/.test(x))?'FAIL gallery tests':'PASS gallery tests';}
+})();
+</script></html>

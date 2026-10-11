@@ -1,0 +1,16 @@
+<!doctype html><html lang="ka"><meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1"><title>იზოლირებული ოპტიმიზაციის ტესტი</title><button id="run">ტესტების გაშვება</button><pre id="result">მხოლოდ სინთეზური ფოტოები; ქსელში არაფერი იგზავნება.</pre><script src="../listing-photos-core.js"></script><script>
+const out=document.querySelector('#result'),core=PoveListingPhotoCore;
+const assert=(ok,msg)=>{if(!ok)throw Error(msg)};
+const encode=(canvas,type)=>new Promise(r=>canvas.toBlob(r,type,.9));
+const make=async(w,h,type)=>{const c=document.createElement('canvas');c.width=w;c.height=h;const ctx=c.getContext('2d');ctx.fillStyle='#4a7654';ctx.fillRect(0,0,w/2,h);const b=await encode(c,type);c.width=c.height=1;return b;};
+const test=async(name,fn)=>{try{await fn();out.textContent+='\nPASS '+name;}catch(e){out.textContent+='\nFAIL '+name+': '+e.message;}};
+document.querySelector('#run').onclick=async()=>{out.textContent='მიმდინარეობს...';
+for(const type of ['image/jpeg','image/png','image/webp'])await test(type+' real decode/resize/encode',async()=>{const b=await make(2400,1200,type);const result=await core.processFile(b),im=await createImageBitmap(result);assert(result.type==='image/webp','format');assert(im.width===1920&&im.height===960,'dimensions');assert(result.size<core.OUTPUT_MAX_BYTES,'size');im.close();});
+await test('small image + alpha preserved',async()=>{const b=await core.processFile(await make(40,20,'image/png')),im=await createImageBitmap(b),c=document.createElement('canvas');c.width=40;c.height=20;const ctx=c.getContext('2d');ctx.drawImage(im,0,0);assert(im.width===40&&im.height===20,'no upscaling');assert(ctx.getImageData(35,10,1,1).data[3]===0,'transparency');im.close();});
+await test('EXIF orientation 6 applied once',async()=>{const jpeg=new Uint8Array(await (await make(40,20,'image/jpeg')).arrayBuffer());const exif=new Uint8Array([255,225,0,34,69,120,105,102,0,0,73,73,42,0,8,0,0,0,1,0,18,1,3,0,1,0,0,0,6,0,0,0,0,0,0,0]);const file=new Blob([jpeg.slice(0,2),exif,jpeg.slice(2)],{type:'image/jpeg'});const im=await createImageBitmap(await core.processFile(file));assert(im.width===20&&im.height===40,'orientation dimensions '+im.width+'x'+im.height);im.close();});
+await test('large 6MB original accepted and optimized',async()=>{const jpg=await make(4000,3000,'image/jpeg');const file=new Blob([jpg,new Uint8Array(6*1024*1024)],{type:'image/jpeg'});const optimized=await core.processFile(file);assert(optimized.size<1024*1024,'optimized size');});
+await test('above 20MB rejected',async()=>{try{await core.processFile(new Blob([new Uint8Array(21*1024*1024)],{type:'image/jpeg'}));throw Error('accepted');}catch(e){assert(e.message.includes('20 MB'),'correct rejection');}});
+await test('corrupt PNG rejected',async()=>{try{await core.processFile(new Blob([new Uint8Array([137,80,78,71,13,10,26,10,0])],{type:'image/png'}));throw Error('accepted');}catch(e){assert(e.message.includes('გახსნა'),'correct rejection');}});
+await test('unsupported/corrupt HEIC has clear error',async()=>{try{await core.processFile(new Blob([new Uint8Array([0,0,0,24]),'ftypheic',new Uint8Array(4),'mif1heic'],{type:'image/heic'}));throw Error('accepted');}catch(e){assert(e.message.includes('HEIC/HEIF'),'clear error');}});
+out.textContent+='\nDONE';};
+</script></html>

@@ -113,7 +113,7 @@ function enhancedUpdateResults(){
  const chips=document.getElementById('scheduleChips');if(chips)chips.innerHTML=activeFilterMarkup(form);
  const results=document.getElementById('jobResults');if(!results)return;
  const categoryLabel=selectedCategories.length?'კატეგორია: '+(selectedCategories.length===1?esc(selectedCategories[0].sub||('ყველა — '+selectedCategories[0].main)):selectedCategories.length+' არჩეული'):'აირჩიე შენი საქმე';
- const cards=matches.length?'<div class="job-grid">'+matches.map(job=>jobCard(job,{showStatus:true})).join('')+'</div>':'<div class="empty"><strong>განცხადებები ვერ მოიძებნა</strong>შეცვალე ფილტრები ან სხვა სიტყვით სცადე ძებნა.<div><button class="btn btn-secondary btn-small" type="button" data-clear-all-schedule>ყველა ფილტრის გასუფთავება</button></div></div>';
+ const cards=matches.length?'<div class="job-grid">'+matches.map(job=>jobCard(job,{showStatus:job.status!=='active'})).join('')+'</div>':'<div class="empty"><strong>განცხადებები ვერ მოიძებნა</strong>შეცვალე ფილტრები ან სხვა სიტყვით სცადე ძებნა.<div><button class="btn btn-secondary btn-small" type="button" data-clear-all-schedule>ყველა ფილტრის გასუფთავება</button></div></div>';
  results.innerHTML='<div class="results-head"><span>ნაპოვნია <strong>'+matches.length+'</strong> განცხადება</span><span>'+categoryLabel+'</span></div>'+cards;
 }
 updateResults=enhancedUpdateResults;
@@ -136,7 +136,7 @@ function schedulePostPage(){
   <div class="field post-amount-field" ${paymentType==='negotiable'?'hidden':''}><label data-payment-label>${paymentType==='hourly'?'ანაზღაურება საათში (₾) *':paymentType==='fixed'?'სამუშაოს ღირებულება (₾) *':'დღიური ანაზღაურება (₾) *'}</label><input name="pay" type="number" min="1" placeholder="მაგ. 80" data-payment-amount value="${esc(amount)}"><small class="field-hint" data-payment-example>${paymentType==='hourly'?'მაგალითი: 10 ₾ / საათი':paymentType==='fixed'?'მაგალითი: 150 ₾':paymentType==='negotiable'?'ანაზღაურება: შეთანხმებით':'მაგალითი: 80 ₾ / დღე'}</small></div>
   <div class="field"><label>ტელეფონი / საკონტაქტო ინფორმაცია *</label><input name="phone" type="tel" pattern="[+0-9 ()-]{9,}" placeholder="5XX XX XX XX" value="${esc(editingJob?.phone||'')}"></div><div class="field"><label>თქვენი სახელი</label><input name="name" value="${esc(editingJob?.name||user?.name||'')}" placeholder="სახელი და გვარი"></div>
   
-  </div><button class="btn btn-primary form-submit">${editingJob?'ცვლილებების შენახვა':'განცხადების გამოქვეყნება'} →</button><div id="postMessage"></div></form>`,'ადამიანს ვეძებ')}
+  </div>${PoveListingPhotos.field()}<button class="btn btn-primary form-submit">${editingJob?'ცვლილებების შენახვა':'განცხადების გამოქვეყნება'} →</button><div id="postMessage"></div></form>`,'ადამიანს ვეძებ')}
 postPage=schedulePostPage;
 
 // Edit a user's job-seeker profile from the combined "my posts" dashboard.
@@ -218,6 +218,13 @@ function workerCityField(value=''){
  const close=markup.lastIndexOf('</div>');
  return markup.slice(0,close)+'<div class="error-msg worker-city-error" data-worker-city-error hidden role="alert"></div>'+markup.slice(close)
 }
+// Preserve the validation listeners above, then save listing + optional photos with acknowledgement.
+document.addEventListener('submit', event => {
+ const form=event.target;
+ if(!form.matches('#postForm,#workerProfileForm'))return;
+ event.preventDefault();event.stopImmediatePropagation();
+ PoveListingPhotos.submit(form);
+},true);
 function scheduleWorkerProfileForm(){
  const params=new URLSearchParams(location.hash.split('?')[1]||''),editId=params.get('edit'),profile=editId?get('dge-workers',[]).find(row=>row.id===editId&&(row.owner===user?.email||row.email===user?.email)):null;
  if(editId&&!profile)return layout('პროფილის რედაქტირება','ამ პროფილის შეცვლის უფლება არ გაქვს.','<div class="empty"><strong>პროფილი მიუწვდომელია</strong><a class="btn btn-secondary" href="#/dashboard?tab=posts">ჩემს განცხადებებზე დაბრუნება</a></div>');
@@ -230,7 +237,7 @@ function scheduleWorkerProfileForm(){
   ${siteFilterSelectMarkup('paymentType','worker-payment-type','ანაზღაურების პირობა *',kind,[['','აირჩიე'],...formPaymentKinds],'data-worker-payment-type','site-form-select-field')}
   <div class="field" data-worker-pay-field ${negotiable?'hidden':''}><label data-worker-pay-label>${!kind?'სასურველი ანაზღაურება (₾) *':kind==='hourly'?'სასურველი ანაზღაურება (₾ / საათში) *':kind==='fixed'?'სასურველი ფიქსირებული თანხა (₾) *':'სასურველი დღიური ანაზღაურება (₾) *'}</label><input name="pay" type="number" min="1" placeholder="მაგ. 80" value="${esc(pay)}"><small class="field-hint" data-worker-pay-hint>${!kind?'მიუთითე სასურველი თანხა.':kind==='hourly'?'მიუთითე სასურველი საათობრივი თანხა.':kind==='fixed'?'მიუთითე სასურველი სრული თანხა.':'მიუთითე სასურველი დღიური თანხა.'}</small></div>
   ${formChoiceSelectMarkup('availability','worker-availability','როდის ვარ ხელმისაწვდომი *',profile?.availability||'',[['','აირჩიე'],...['დღესვე','ხვალიდან','ამ კვირაში','შეთანხმებით'].map(value=>[value,value])])}<div class="field"><label>საკონტაქტო ინფორმაცია *</label><input name="phone" type="tel" placeholder="5XX XX XX XX" value="${esc(profile?.phone||'')}"></div>
-  <div class="field span-2"><label>მოკლე აღწერა *</label><textarea name="about" placeholder="მოგვიყევი შენს გამოცდილებასა და უნარებზე">${esc(profile?.about||'')}</textarea></div></div><button class="btn btn-primary form-submit">${profile?'ცვლილებების შენახვა':'პროფილის გამოქვეყნება'} →</button><div id="workerMessage"></div></form>`,'სამუშაოს ვეძებ')
+  <div class="field span-2"><label>მოკლე აღწერა *</label><textarea name="about" placeholder="მოგვიყევი შენს გამოცდილებასა და უნარებზე">${esc(profile?.about||'')}</textarea></div></div>${PoveListingPhotos.field()}<button class="btn btn-primary form-submit">${profile?'ცვლილებების შენახვა':'პროფილის გამოქვეყნება'} →</button><div id="workerMessage"></div></form>`,'სამუშაოს ვეძებ')
 }
 workerProfileForm=scheduleWorkerProfileForm;
 

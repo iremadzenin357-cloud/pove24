@@ -1,10 +1,11 @@
 (()=>{
+  if(window.PoveTheme)return;
   const root=document.documentElement;
   const key='pove-theme';
   const toggle=document.getElementById('themeToggle');
   const themeColor=document.querySelector('meta[name="theme-color"]');
   const preference=window.matchMedia?.('(prefers-color-scheme: dark)');
-  let transitionTimer=0;
+  let transitionFrame=0;
 
   function savedTheme(){
     try{
@@ -16,9 +17,15 @@
   function applyTheme(theme,persist=false){
     const selected=theme==='dark'?'dark':'light';
     if(persist){
-      root.classList.add('theme-transition');
-      window.clearTimeout(transitionTimer);
-      transitionTimer=window.setTimeout(()=>root.classList.remove('theme-transition'),260);
+      // Suppress existing hover transitions for the first painted theme frame.
+      root.classList.add('theme-switching');
+      window.cancelAnimationFrame(transitionFrame);
+      transitionFrame=window.requestAnimationFrame(()=>{
+        transitionFrame=window.requestAnimationFrame(()=>{
+          root.classList.remove('theme-switching');
+          transitionFrame=0;
+        });
+      });
     }
     root.dataset.theme=selected;
     root.style.colorScheme=selected;

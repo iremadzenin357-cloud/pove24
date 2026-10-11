@@ -44,7 +44,11 @@
     'app.js?v=20261008-seamless-startup-v1',
     'flow.js?v=20261008-seamless-startup-v1',
     'geo-ui.js?v=20261008-home-search-actions-v2',
+    'design-home.js?v=20261008-redesign',
     'ratings.js?v=20261008-features-off',
+    'listing-photos-core.js?v=20261011-photo-completion-v3',
+    'listing-photos.js?v=20261011-photo-completion-v3',
+    'detail-gallery.js?v=20261011-infrastructure-fixes-v2',
     'schedule.js?v=20261008-worker-experience-duration-inline-validation-v2',
     'social.js?v=20261008-features-off',
     'job-status.js?v=20261008-status-icons-check-cross',
@@ -59,13 +63,15 @@
     'georgian-validation.js',
     'owner-listing-actions.js?v=20261008-features-off',
     'ratings-feature.js?v=20261008-features-off',
-    'theme.js?v=20260930-dark-mode',
     'job-search-save.js?v=20260930-hide-search-subcategory',
     'view-counts.js?v=20261008-job-status-placement',
     'worker-search-filters.js?v=20261007-worker-city-area',
     'listing-pagination.js?v=20261008-status-group-order',
     'home-listing-types.js?v=20261008-active-home-jobs',
-    'navigation-performance.js?v=20261008-seamless-startup-v1'
+    'navigation-performance.js?v=20261008-seamless-startup-v1',
+    'design-interactions.js?v=20261008-redesign',
+    'photo-moderation.js?v=20261011-infrastructure-fixes-v2',
+    'account-deletion.js?v=20261011-local-v1'
   ];
 
   function loadScriptsInOrder(sources, continueOnError = false) {
@@ -99,7 +105,7 @@
     await loadScriptsInOrder([
       'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
       'supabase-config.js',
-      'supabase-client.js',
+      'supabase-client.js?v=20261011-recovery',
       'phone-validation.js?v=20261008-georgian-mobile-prefix-neutral-focus',
       'supabase-data.js?v=20261008-parallel-startup-v2'
     ]);
@@ -107,13 +113,14 @@
     // Fetch app scripts alongside Supabase's first data load; execute them only
     // after the signed-in state is ready, so protected routes keep their behavior.
     await window.Pove24Store.initialize();
-    await loadScriptsInOrder(['supabase-auth.js']);
+    await loadScriptsInOrder(['supabase-auth.js?v=20261011-recovery']);
     await loadScriptsInOrder(legacyScriptUrls, true);
     preloadedScripts.forEach(link => link.remove());
     window.Pove24AppBridge?.hydrate();
     await window.Pove24Store.waitUntilReady();
     window.Pove24AppBridge?.hydrate();
     const app = document.getElementById('app');
+    await window.Pove24Auth?.ready();
     app?.removeAttribute('inert');
     app?.removeAttribute('aria-busy');
   } catch (error) {
