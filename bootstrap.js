@@ -105,7 +105,7 @@
     await loadScriptsInOrder([
       'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
       'supabase-config.js',
-      'supabase-client.js',
+      'supabase-client.js?v=20261011-recovery',
       'phone-validation.js?v=20261008-georgian-mobile-prefix-neutral-focus',
       'supabase-data.js?v=20261008-parallel-startup-v2'
     ]);
@@ -113,13 +113,14 @@
     // Fetch app scripts alongside Supabase's first data load; execute them only
     // after the signed-in state is ready, so protected routes keep their behavior.
     await window.Pove24Store.initialize();
-    await loadScriptsInOrder(['supabase-auth.js']);
+    await loadScriptsInOrder(['supabase-auth.js?v=20261011-recovery']);
     await loadScriptsInOrder(legacyScriptUrls, true);
     preloadedScripts.forEach(link => link.remove());
     window.Pove24AppBridge?.hydrate();
     await window.Pove24Store.waitUntilReady();
     window.Pove24AppBridge?.hydrate();
     const app = document.getElementById('app');
+    await window.Pove24Auth?.ready();
     app?.removeAttribute('inert');
     app?.removeAttribute('aria-busy');
   } catch (error) {
