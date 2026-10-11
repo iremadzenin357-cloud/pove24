@@ -1,0 +1,8 @@
+**
+!photo-operations/
+photo-operations/**
+!photo-operations/Dockerfile
+!photo-operations/Dockerfile.dockerignore
+!photo-operations/requirements.txt
+!photo-operations/worker.py
+!photo-operations/runner.py
