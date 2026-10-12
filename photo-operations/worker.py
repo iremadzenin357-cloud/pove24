@@ -31,6 +31,46 @@ LIMIT = 5 * 1024 * 1024
 UUID = r'[0-9a-f]{8}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{4}-[0-9a-f]{12}'
 PATH = re.compile(rf'^{UUID}/{UUID}\.webp$')
 
+RPC_STAGES = {
+    'listing_photo_worker_lease': 'lease',
+    'listing_photo_gc_batch': 'cleanup_batch',
+    'listing_photo_gc_finish': 'cleanup_finish',
+    'listing_photo_validation_batch': 'validation_batch',
+    'listing_photo_record_validation': 'validation_record',
+    'listing_photo_orphan_batch': 'orphan_batch',
+    'listing_photo_retry': 'retry_record',
+}
+STAGES = set(RPC_STAGES.values()) | {'cycle', 'lease_acquire', 'lease_renew',
+    'lease_release', 'lease_success', 'storage_download', 'storage_remove', 'photo_processing'}
+
+class DiagnosticFailure(RuntimeError):
+    def __init__(self, stage='cycle', rpc=None, http_status=None, error_code=None):
+        super().__init__('photo operation failed')
+        self.stage = stage if stage in STAGES else 'cycle'
+        self.rpc = rpc if rpc in RPC_STAGES else None
+        self.http_status = http_status if type(http_status) is int and 100 <= http_status <= 599 else None
+        self.error_code = error_code if isinstance(error_code, str) and re.fullmatch(r'(?:[0-9A-Z]{5}|PGRST[0-9]{3})', error_code) else None
+
+def diagnostic(exc, stage='cycle', rpc=None):
+    if isinstance(exc, DiagnosticFailure):
+        return DiagnosticFailure(stage if stage != 'cycle' else exc.stage,
+                                 rpc or exc.rpc, exc.http_status, exc.error_code)
+    return DiagnosticFailure(stage, rpc)
+
+def log_failure(exc, event='cycle_failed'):
+    safe = diagnostic(exc)
+    print(json.dumps({'event': event if event in ('cycle_failed','photo_failed','lease_release_failed') else 'cycle_failed',
+        'stage':safe.stage,'rpc':safe.rpc,'http_status':safe.http_status,'error_code':safe.error_code}), flush=True)
+
+def call_rpc(api, name, body=None):
+    stage = RPC_STAGES.get(name, 'cycle')
+    if name == 'listing_photo_worker_lease':
+        stage = 'lease_' + (body or {}).get('p_action', '')
+    try:
+        return api.rpc(name, body)
+    except Exception as exc:
+        raise diagnostic(exc, stage, name) from None
+
 
 class MissingPhoto(RuntimeError):
     """Definitive object-not-found; not a transient transport or authorization error."""
@@ -109,39 +149,59 @@ class API:
                     raise MissingPhoto('photo object missing') from None
                 retryable = not isinstance(exc, HTTPError) or exc.code in (408, 429, 500, 502, 503, 504)
                 if method not in ('GET', 'DELETE') or not retryable or attempt == 2:
-                    raise RuntimeError('backend request failed') from None
+                    code = None
+                    if isinstance(exc, HTTPError):
+                        try:
+                            payload = json.loads(exc.read(8192))
+                            code = payload.get('code') if isinstance(payload, dict) else None
+                        except Exception:
+                            pass
+                    raise DiagnosticFailure(http_status=exc.code if isinstance(exc, HTTPError) else None,
+                                            error_code=code) from None
                 time.sleep(2 ** attempt + random.random())
 
     def rpc(self, name, body=None):
         return self.request('/rest/v1/rpc/' + name, body=body or {})
 
     def download(self, path):
-        return self.request('/storage/v1/object/authenticated/' + BUCKET + '/' + quote(safe_path(path), safe='/'),
-                            method='GET', binary=True)
+        try:
+            return self.request('/storage/v1/object/authenticated/' + BUCKET + '/' + quote(safe_path(path), safe='/'),
+                                method='GET', binary=True)
+        except MissingPhoto:
+            raise
+        except Exception as exc:
+            raise diagnostic(exc, 'storage_download') from None
 
     def remove(self, path):
-        self.request('/storage/v1/object/' + BUCKET, method='DELETE', body={'prefixes': [safe_path(path)]})
+        try:
+            self.request('/storage/v1/object/' + BUCKET, method='DELETE', body={'prefixes': [safe_path(path)]})
+        except Exception as exc:
+            raise diagnostic(exc, 'storage_remove') from None
 
 
 def cycle(api, decoder=validate_image):
     token = str(uuid.uuid4())
-    if not api.rpc('listing_photo_worker_lease', {'p_token': token, 'p_action': 'acquire'}):
-        raise RuntimeError('another worker owns the lease')
+    if not call_rpc(api, 'listing_photo_worker_lease', {'p_token': token, 'p_action': 'acquire'}):
+        raise DiagnosticFailure('lease_acquire', 'listing_photo_worker_lease')
     api.worker_token = token
     successful = False
     stop = threading.Event()
     lost = threading.Event()
+    renewal_failure = []
+    primary_failure = None
     renewal_lock = threading.Lock()
     def heartbeat():
         if lost.is_set():
-            raise RuntimeError('worker lease lost')
+            raise renewal_failure[0]
         with renewal_lock:
             try:
-                if not api.rpc('listing_photo_worker_lease', {'p_token': token, 'p_action': 'renew'}):
-                    raise RuntimeError('worker lease lost')
-            except Exception:
+                if not call_rpc(api, 'listing_photo_worker_lease', {'p_token': token, 'p_action': 'renew'}):
+                    raise DiagnosticFailure('lease_renew', 'listing_photo_worker_lease')
+            except Exception as exc:
+                failure = diagnostic(exc, 'lease_renew', 'listing_photo_worker_lease')
+                renewal_failure.append(failure)
                 lost.set()
-                raise RuntimeError('worker lease renewal failed') from None
+                raise failure from None
     def renew_in_background():
         while not stop.wait(30):
             try:
@@ -155,14 +215,21 @@ def cycle(api, decoder=validate_image):
         heartbeat()
         successful = not result['errors']
         return result
+    except Exception as exc:
+        primary_failure = exc
+        raise
     finally:
         stop.set()
         renewal.join()
         try:
-            released = api.rpc('listing_photo_worker_lease', {
+            released = call_rpc(api, 'listing_photo_worker_lease', {
                 'p_token': token, 'p_action': 'success' if successful else 'release'})
             if not released:
-                raise RuntimeError('worker lease lost before completion')
+                raise DiagnosticFailure('lease_success' if successful else 'lease_release', 'listing_photo_worker_lease')
+        except Exception as exc:
+            if primary_failure is None:
+                raise
+            log_failure(exc, 'lease_release_failed')
         finally:
             api.worker_token = None
 
@@ -173,21 +240,22 @@ def process_batches(api, decoder, heartbeat):
         counts['errors'] += 1
         heartbeat()
         # If persisting retry fails, abort: never report a successful cycle.
-        api.rpc('listing_photo_retry', {'p_id': None if orphan else row['id'], 'p_path': row['storage_path']})
+        call_rpc(api, 'listing_photo_retry', {'p_id': None if orphan else row['id'], 'p_path': row['storage_path']})
     # Urgent/terminal removals precede decoding. Paths can never be reattached/reapproved.
     heartbeat()
-    for row in api.rpc('listing_photo_gc_batch'):
+    for row in call_rpc(api, 'listing_photo_gc_batch'):
         heartbeat()
         try:
             api.remove(safe_path(row['storage_path']))
             heartbeat()
-            api.rpc('listing_photo_gc_finish', {'p_id': row['id']})
+            call_rpc(api, 'listing_photo_gc_finish', {'p_id': row['id']})
             counts['retired_processed'] += 1
-        except Exception:
+        except Exception as exc:
+            log_failure(diagnostic(exc) if isinstance(exc, DiagnosticFailure) else diagnostic(exc, 'photo_processing'), 'photo_failed')
             retry(row)
     # No automatic content approval. Successful decoding only unlocks admin review.
     heartbeat()
-    for row in api.rpc('listing_photo_validation_batch'):
+    for row in call_rpc(api, 'listing_photo_validation_batch'):
         heartbeat()
         try:
             try:
@@ -198,20 +266,22 @@ def process_batches(api, decoder, heartbeat):
                 # owner feedback and let the terminal cleanup queue finish it.
                 data, valid = b'', False
             heartbeat()
-            api.rpc('listing_photo_record_validation', {
+            call_rpc(api, 'listing_photo_record_validation', {
                 'p_id': row['id'], 'p_sha256': hashlib.sha256(data).hexdigest() if valid else None,
                 'p_valid': valid})
             counts['validated' if valid else 'rejected'] += 1
-        except Exception:
+        except Exception as exc:
+            log_failure(diagnostic(exc) if isinstance(exc, DiagnosticFailure) else diagnostic(exc, 'photo_processing'), 'photo_failed')
             retry(row)  # Transport errors never become content rejection.
     heartbeat()
-    for row in api.rpc('listing_photo_orphan_batch'):
+    for row in call_rpc(api, 'listing_photo_orphan_batch'):
         heartbeat()
         try:
             api.remove(safe_path(row['storage_path']))
             heartbeat()
             counts['orphans_processed'] += 1
-        except Exception:
+        except Exception as exc:
+            log_failure(diagnostic(exc) if isinstance(exc, DiagnosticFailure) else diagnostic(exc, 'photo_processing'), 'photo_failed')
             retry(row, orphan=True)
     return counts
 

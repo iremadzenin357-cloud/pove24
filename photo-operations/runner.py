@@ -5,7 +5,7 @@ import signal
 import threading
 import random
 from pathlib import Path
-from worker import API, cycle
+from worker import API, cycle, log_failure
 
 def main():
     # Mounted secret, not Docker build args / image layers / frontend environment.
@@ -23,10 +23,10 @@ def main():
             result = cycle(api)
             failures = failures + 1 if result['errors'] else 0
             print(json.dumps({'event':'cycle', **result}), flush=True)
-        except Exception:
+        except Exception as exc:
             failures += 1
             # Do not log exception bodies, URLs, headers, paths or credentials.
-            print(json.dumps({'event':'cycle_failed'}), flush=True)
+            log_failure(exc)
         delay = min(300, 30 * 2 ** min(failures, 4)) + random.uniform(0, 5)
         stop.wait(delay)
 
