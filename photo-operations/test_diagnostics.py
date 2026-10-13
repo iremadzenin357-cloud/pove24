@@ -19,7 +19,7 @@ class DiagnosticsTests(unittest.TestCase):
         out=io.StringIO()
         with redirect_stdout(out):log_failure(caught.exception)
         self.assertEqual(json.loads(out.getvalue()),{'event':'cycle_failed','stage':'lease_acquire',
-            'rpc':'listing_photo_worker_lease','http_status':403,'error_code':'42501'})
+            'rpc':'listing_photo_worker_lease','http_status':403,'error_code':'42501','failure_kind':'unknown'})
 
     def test_codes_and_malformed_responses(self):
         for payload,expected in [(b'{"code":"PGRST202"}','PGRST202'),
@@ -66,6 +66,6 @@ class DiagnosticsTests(unittest.TestCase):
         error=DiagnosticFailure();error.stage='SECRET';error.rpc='/private/path';error.error_code='token';error.http_status='secret'
         out=io.StringIO()
         with redirect_stdout(out):log_failure(error)
-        self.assertEqual(json.loads(out.getvalue()),{'event':'cycle_failed','stage':'cycle','rpc':None,'http_status':None,'error_code':None})
+        self.assertEqual(json.loads(out.getvalue()),{'event':'cycle_failed','stage':'cycle','rpc':None,'http_status':None,'error_code':None,'failure_kind':'unknown'})
 
 if __name__=='__main__':unittest.main()
