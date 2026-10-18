@@ -9,3 +9,9 @@
 7. Delete a synthetic photo/worker listing and confirm nullable report references do not block cleanup. Existing report/account retention behavior is otherwise unchanged. Check mobile picker, gallery swipes, report dialog and admin navigation. Existing signed URLs can remain accessible for their remaining lifetime after removal; new signing must fail.
 
 Local validation uses Node mocks and PostgreSQL/pglast SQL + PL/pgSQL parsing. No SQL has been executed; RLS, FK-trigger interaction, privileges, concurrent transactions, Storage behavior and browser/mobile integration remain unverified against a database.
+
+## Target immutability hardening
+
+Trigger nesting is no longer trusted. Unchanged targets permit normal status updates; changed targets always fail except nullable reference cleanup executed as the `reports` table owner after the referenced parent is actually absent. Reporter INSERT target lookups remain SECURITY INVOKER. No new UPDATE grants are added. The existing frontend inserts the two reference columns and changes only `status` during admin review.
+
+This migration is intentionally one-shot, not idempotent: existing columns/functions/indexes abort the transaction on a repeat application. This edit is for the still-unapplied migration. If it was applied elsewhere, do not rerun it; prepare a separate corrective migration. Real FK cleanup must be tested with the actual table owners and privileges (including worker-profile deletion initiated by its authenticated owner and photo cleanup by the worker). A different ownership/forced-RLS setup can fail closed and block cleanup; nesting alone never authorizes nulling.

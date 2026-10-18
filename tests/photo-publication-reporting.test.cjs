@@ -39,7 +39,7 @@ test('new migration preserves terminal guards, lock, audit and upload flag',()=>
  assert.match(sql,/then 'approved' else 'rejected'/);assert.match(sql,/'file_validated'/);assert.match(sql,/'auto_approved'/);
  assert.doesNotMatch(sql,/set uploads_enabled|create policy|drop policy/i);
  assert.match(sql,/photo target mismatch/);assert.match(sql,/owner mismatch/);
- assert.match(sql,/pg_trigger_depth\(\)>1/);assert.match(sql,/on delete set null/);
+ assert.doesNotMatch(sql,/pg_trigger_depth/);assert.match(sql,/current_user = pg_catalog.pg_get_userbyid/);assert.match(sql,/on delete set null/);
  assert.match(sql,/if not public.listing_photo_is_admin\(\)/);
 });
 test('photo report navigation and moderation reuse remain wired',()=>{
@@ -50,3 +50,38 @@ test('photo report navigation and moderation reuse remain wired',()=>{
 });
 test('job report sends job target without a worker reference',async()=>{const x=setup();x.release();await x.api.submitReport({id:'request',relatedJob:'job',reason:'test'});assert.equal(x.calls[0].row.job_post_id,'jobs:job');assert.equal(x.calls[0].row.worker_profile_id,null)});
 test('invalid admin status never reaches database',async()=>{const x=setup({admin:true});await assert.rejects(x.api.updateReportStatus('job','local','invalid'));assert.equal(x.calls.length,0)});
+
+// Model tests document the SQL guard, not a substitute for real FK/RLS execution.
+function cleanupAllowed({owner=false,oldWorker='w',worker='w',oldPhoto='p',photo='p',workerExists=true,photoExists=true,jobChanged=false,userChanged=false}={}) {
+ if(jobChanged||userChanged)return false;
+ if(worker===oldWorker&&photo===oldPhoto)return true;
+ return owner && (worker===oldWorker||(worker===null&&oldWorker!==null&&!workerExists))
+   && (photo===oldPhoto||(photo===null&&oldPhoto!==null&&!photoExists));
+}
+test('cleanup guard denies nested caller nulling even when parent is hidden by RLS',()=>{
+ assert.equal(cleanupAllowed({photo:null,photoExists:false}),false);
+ assert.equal(cleanupAllowed({worker:null,workerExists:false}),false);
+});
+test('cleanup guard denies replacing target even to trusted table owner',()=>{
+ assert.equal(cleanupAllowed({owner:true,photo:'another',photoExists:false}),false);
+ assert.equal(cleanupAllowed({owner:true,worker:'another',workerExists:false}),false);
+ assert.equal(cleanupAllowed({owner:true,jobChanged:true}),false);
+ assert.equal(cleanupAllowed({owner:true,userChanged:true}),false);
+});
+test('cleanup only permits owner-context NULL after real parent deletion',()=>{
+ assert.equal(cleanupAllowed({owner:true,photo:null}),false);
+ assert.equal(cleanupAllowed({owner:true,worker:null}),false);
+ assert.equal(cleanupAllowed({owner:true,photo:null,photoExists:false}),true);
+ assert.equal(cleanupAllowed({owner:true,worker:null,workerExists:false}),true);
+ assert.equal(cleanupAllowed(),true);
+});
+test('migration is one-shot and cleanup checks both parent records without RLS bypassing insert',()=>{
+ const sql=fs.readFileSync('migrations/20261018_photo_publication_reporting.sql','utf8');
+ assert.match(sql,/not exists\(select 1 from public.worker_profiles where id=old.worker_profile_id\)/);
+ assert.match(sql,/not exists\(select 1 from public.listing_photos where id=old.listing_photo_id\)/);
+ const trigger=sql.split('create function public.validate_report_listing_target()')[1].split('create trigger')[0];
+ assert.doesNotMatch(trigger,/security definer/i);
+ assert.match(sql,/add column worker_profile_id/);assert.doesNotMatch(sql,/if not exists/i);
+ assert.match(sql,/grant select\(worker_profile_id,listing_photo_id\), insert\(worker_profile_id,listing_photo_id\)/);
+ assert.doesNotMatch(sql,/grant update/i);
+});

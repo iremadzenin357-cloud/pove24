@@ -38,10 +38,20 @@ begin
    and new.worker_profile_id is not distinct from old.worker_profile_id
    and new.listing_photo_id is not distinct from old.listing_photo_id
    and new.target_user_id is not distinct from old.target_user_id then return new; end if;
-  if pg_trigger_depth()>1 and new.job_post_id is not distinct from old.job_post_id
+  -- Nesting depth is not authority. PostgreSQL's FK action runs as the
+  -- referencing table owner; also require actual parent absence, never RLS invisibility.
+  -- Keep this function INVOKER so INSERT lookups still use the reporter's RLS.
+  if current_user = pg_catalog.pg_get_userbyid(
+      (select relowner from pg_catalog.pg_class where oid='public.reports'::regclass))
+   and new.job_post_id is not distinct from old.job_post_id
    and new.target_user_id is not distinct from old.target_user_id
-   and (new.worker_profile_id is null or new.worker_profile_id is not distinct from old.worker_profile_id)
-   and (new.listing_photo_id is null or new.listing_photo_id is not distinct from old.listing_photo_id) then return new; end if;
+   and (new.worker_profile_id is not distinct from old.worker_profile_id
+     or (new.worker_profile_id is null and old.worker_profile_id is not null
+       and not exists(select 1 from public.worker_profiles where id=old.worker_profile_id)))
+   and (new.listing_photo_id is not distinct from old.listing_photo_id
+     or (new.listing_photo_id is null and old.listing_photo_id is not null
+       and not exists(select 1 from public.listing_photos where id=old.listing_photo_id)))
+   then return new; end if;
   raise exception 'report target is immutable';
  end if;
  if new.listing_photo_id is not null then
