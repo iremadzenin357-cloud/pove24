@@ -15,7 +15,7 @@
     const repository=window.PoveListingPhotoCore.repository(client,window.Pove24Store.accountRef());
     return (data||[]).map(photo=>({...photo,getUrl:()=>repository.preview(photo.storage_path)}));
   }
-  function createGallery(host,photos){
+  function createGallery(host,photos,target=null){
     if(!photos.length)return null;
     photos=[...photos].sort((a,b)=>a.position-b.position).slice(0,5);
     let selected=0,initialized=false;
@@ -26,6 +26,9 @@
     const status=document.createElement('span');status.className='pv-gallery-status';status.setAttribute('role','status');
     const expand=document.createElement('span');expand.className='pv-gallery-expand';expand.innerHTML=icon('M8 3H3v5m13-5h5v5M3 16v5h5m13-5v5h-5');
     main.append(mainImage,status,expand);section.append(main);
+    const report=button('ფოტოს დარეპორტება','ფოტოს დარეპორტება','report-link');
+    if(target){report.addEventListener('click',()=>openReport({dataset:{reportPhoto:photos[selected].id,
+      reportJob:target.kind==='jobs'?target.id:'',reportWorker:target.kind==='workers'?target.id:''}}));section.append(report);}
     const thumbs=[];
     async function url(index){
       let entry=urls.get(index);
@@ -91,7 +94,7 @@
     try{
       const photos=await loadPhotos(kind,id);if(!photos.length||!article.isConnected||location.hash!==route)return;
       const host=document.createElement('div');host.className='pv-gallery-host';
-      const before=article.querySelector('h3');article.insertBefore(host,before);createGallery(host,photos);
+      const before=article.querySelector('h3');article.insertBefore(host,before);createGallery(host,photos,{kind,id});
     }catch{/* Missing setup or denied access must preserve the existing detail layout. */}
   }
   window.addEventListener('hashchange',()=>{closeViewer?.();scan();});

@@ -1,0 +1,2 @@
+# Reviewed separately from the browser deployment. Install only on the trusted worker.
+Pillow==12.3.0
