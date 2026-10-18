@@ -8,8 +8,10 @@
     if(path!=='/admin/photos'||!window.Pove24Store?.isAdmin())return previousView(path);
     app.innerHTML=adminShell('photos','<h2>განცხადების ფოტოები</h2><div class="admin-tabs" data-photo-filters></div><p role="status" data-photo-admin-status></p><div class="admin-review-list" data-photo-queue></div><button class="btn btn-secondary" data-photo-more hidden>შემდეგი ფოტოები</button>');
     const container=app.querySelector('[data-photo-queue]'),notice=app.querySelector('[data-photo-admin-status]');
+    const requestedPhoto=new URLSearchParams(location.hash.split('?')[1]||'').get('photo');
+    let focusedPhoto=requestedPhoto;
     const more=app.querySelector('[data-photo-more]');let after=null,filter='pending_review',loading=false,generation=0;
-    const labels={pending_review:'მოლოდინში',approved:'დამტკიცებული',rejected:'უარყოფილი',removed:'მოხსნილი'};
+    const labels={pending_review:'შემოწმების მოლოდინში',approved:'შემოწმებული / დამტკიცებული',rejected:'უარყოფილი',removed:'მოხსნილი'};
     const client=Pove24Store.client;
     async function rpc(name,args){const r=await client.rpc(name,args);if(r.error)throw r.error;return r.data;}
     function card(photo){
@@ -38,12 +40,13 @@
       if(loading&&!reset)return;
       const token=++generation;loading=true;more.disabled=true;notice.textContent='იტვირთება…';
       if(reset){after=null;container.replaceChildren();}
-      try{const rows=await rpc('listing_photo_review_queue',{p_after:after,p_status:filter});if(token!==generation||!container.isConnected)return;
+      try{const single=focusedPhoto?await rpc('listing_photo_review_one',{p_id:focusedPhoto}):null;
+        const rows=focusedPhoto?(single?[single]:[]):await rpc('listing_photo_review_queue',{p_after:after,p_status:filter});if(token!==generation||!container.isConnected)return;
         rows.forEach(p=>container.append(card(p)));after=rows.at(-1)?.id||after;more.hidden=rows.length<50;notice.textContent=rows.length?'':'ფოტოები არ არის.';
       }catch{if(token===generation)notice.textContent='ფოტოების სია მიუწვდომელია. გადაამოწმე ინფრასტრუქტურა და ადმინისტრატორის უფლებები.';}
       finally{if(token===generation){loading=false;more.disabled=false;}}
     }
-    for(const [value,label] of Object.entries(labels)){const b=document.createElement('button');b.className='btn btn-secondary btn-small';b.textContent=label;b.addEventListener('click',()=>{filter=value;load(true);});app.querySelector('[data-photo-filters]').append(b);}
+    for(const [value,label] of Object.entries(labels)){const b=document.createElement('button');b.className='btn btn-secondary btn-small';b.textContent=label;b.addEventListener('click',()=>{focusedPhoto=null;filter=value;load(true);});app.querySelector('[data-photo-filters]').append(b);}
     more.addEventListener('click',()=>load());load(true);accountNavigation();return true;
   };
 })();

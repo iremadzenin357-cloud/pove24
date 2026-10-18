@@ -101,7 +101,7 @@
       }
       card.append(reorder);
       const status=document.createElement('small');status.className='listing-photo-first';
-      const labels={pending_review:'განხილვის მოლოდინში',approved:'დამტკიცებულია',rejected:'უარყოფილია',removed:'ჩვენებიდან მოხსნილია'};
+      const labels={pending_review:'ტექნიკური შემოწმების მოლოდინში',approved:'შემოწმებულია',rejected:'უარყოფილია',removed:'ჩვენებიდან მოხსნილია'};
       status.textContent=item.blob&&!item.remote?'შენახვის შემდეგ გაივლის განხილვას':(labels[item.moderation_status||item.remote?.moderation_status]||'განხილვის მოლოდინში');
       if(item.review_reason)status.textContent+=' — '+item.review_reason;
       card.append(status);target.append(card);

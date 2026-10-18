@@ -254,6 +254,7 @@
       id: row.legacy_id || row.id, uuid: row.id, reporterId: uiRef(row.reporter_id),
       reportingUser: uiRef(row.reporter_id), reportedUser: uiRef(row.target_user_id),
       relatedJob: row.job_post_id ? legacyId('jobs', row.job_post_id) : null,
+      relatedWorker: row.worker_profile_id || null, photoId: row.listing_photo_id || null,
       reason: row.reason, description: row.description || '', status: row.status,
       createdAt: Date.parse(row.created_at) || Date.now()
     })));
@@ -642,6 +643,12 @@
   async function persistReports(next, previous, reviewReports = false) {
     if (!authUser) return;
     for (const report of changedRows(next, previous)) {
+      const existing = (previous || []).find(row => row.id === report.id);
+      if (isAdmin() && existing?.uuid) {
+        await run(client.from(reviewReports ? 'review_reports' : 'reports')
+          .update({status: report.status}).eq('id', existing.uuid).select('id').single());
+        continue;
+      }
       if (reviewReports) {
         const review = (cache.get('dge-reviews') || []).find(row => row.id === report.reviewId || row.uuid === report.reviewId);
         if (sameUser(report.reporterId)) {
@@ -734,6 +741,36 @@
   }
 
   window.Pove24Store = {
+    async submitReport(report) {
+      if (!authUser) throw new Error('ანგარიშზე შესვლა აუცილებელია.');
+      const caller = authUser.id;
+      const row = {
+        reporter_id: caller, status: 'new', legacy_id: report.id,
+        target_user_id: report.reportedUser ? await lookupProfileId(report.reportedUser) : null,
+        job_post_id: report.relatedJob ? resolveId('jobs', report.relatedJob) : null,
+        worker_profile_id: report.relatedWorker ? resolveId('workers', report.relatedWorker) : null,
+        listing_photo_id: report.photoId || null,
+        reason: report.reason, description: report.description || null
+      };
+      if (authUser?.id !== caller) throw new Error('ანგარიში შეიცვალა.');
+      // Read first on retry: a previous successful insert response may have been lost.
+      let saved = await run(client.from('reports').select('id').eq('reporter_id', caller).eq('legacy_id', report.id).maybeSingle());
+      if (!saved) saved = await run(client.from('reports').insert(row).select('id').single());
+      if (!saved?.id) throw new Error('რეპორტი ვერ შეინახა.');
+      if (authUser?.id === caller) setCache('dge-reports', [...(cache.get('dge-reports') || []).filter(r => r.id !== report.id),
+        {...report, uuid: saved.id, reporterId: caller, reportingUser: caller, status: 'new', createdAt: Date.now()}]);
+      return saved;
+    },
+    async updateReportStatus(kind, id, status) {
+      if (!isAdmin() || !['reviewed','closed'].includes(status)) throw new Error('წვდომა შეზღუდულია.');
+      const key = kind === 'review' ? 'dge-review-reports' : 'dge-reports';
+      const rows = cache.get(key) || [], row = rows.find(r => r.id === id);
+      if (!row?.uuid) throw new Error('განაახლე რეპორტების სია.');
+      const saved = await run(client.from(kind === 'review' ? 'review_reports' : 'reports')
+        .update({status}).eq('id', row.uuid).select('id').single());
+      if (!saved?.id) throw new Error('ცვლილება ვერ შეინახა.');
+      setCache(key, rows.map(r => r.id === id ? {...r, status} : r));
+    },
     async saveFormListing(kind, row) {
       if (!authUser || !sameUser(row.owner)) throw new Error('ამ განცხადების შეცვლის უფლება არ გაქვს.');
       if (kind !== 'jobs' && kind !== 'workers') throw new Error('არასწორი განცხადების ტიპი.');
