@@ -150,11 +150,11 @@ html body.pv-redesign .pv-role-seek:hover{background:#dbe7cd;border-color:#9cb58
 html[data-theme="dark"] body.pv-redesign .pv-role-hire{background:#254d38;border-color:#59744d}
 html[data-theme="dark"] body.pv-redesign .pv-role-seek{background:#d5ef70;border-color:#d5ef70;color:#183c31}
 @media(max-width:760px){
-html body.pv-redesign .pv-hero-actions.pv-role-choices{gap:10px}
-html body.pv-redesign .pv-role-choice{grid-template-columns:1fr 16px;gap:9px;min-height:96px;padding:13px;border-radius:13px}
-html body.pv-redesign .pv-role-choice .pv-role-icon{grid-column:1;grid-row:1;width:23px;height:23px}
-html body.pv-redesign .pv-role-choice .pv-role-arrow{grid-column:2;grid-row:1;justify-self:end}
-html body.pv-redesign .pv-role-choice .pv-role-label{grid-column:1/-1;grid-row:2;font-size:14px;line-height:1.5;max-width:100%}
+html body.pv-redesign .pv-hero-actions.pv-role-choices{gap:8px;width:100%;max-width:470px;align-items:stretch}
+html body.pv-redesign .pv-role-choice{grid-template-columns:20px minmax(0,1fr);grid-template-rows:1fr;align-items:center;gap:8px;min-width:0;min-height:68px;padding:12px;border-radius:12px}
+html body.pv-redesign .pv-role-choice .pv-role-icon{grid-column:1;grid-row:1;width:20px;height:20px;align-self:center;display:block}
+html body.pv-redesign .pv-role-choice .pv-role-arrow{display:none}
+html body.pv-redesign .pv-role-choice .pv-role-label{grid-column:2;grid-row:1;left:0;min-width:0;font-size:12px;line-height:1.5;max-width:100%;white-space:normal;overflow-wrap:normal;text-align:left}
 }
 /* Readable home guide cards in both themes; scoped above legacy card rules. */
 html body.pv-redesign #how.pv-how-section .how-grid{gap:22px;margin-bottom:28px}
@@ -512,3 +512,33 @@ html[data-theme="dark"] body.pv-redesign .header .theme-toggle .theme-icon-moon{
 /* Red heart for saved listings in the account menu. */
 body .account-dropdown a[href="#/saved"] .day-icon{color:#cf4d58!important;stroke:#cf4d58;fill:#cf4d5818}
 html[data-theme="dark"] body .account-dropdown a[href="#/saved"] .day-icon{color:#f08089!important;stroke:#f08089;fill:#f0808918}
+
+/* Make pay and availability values readable on mobile profile details. */
+@media(max-width:600px){
+  html body.pv-redesign #app .detail-layout > .profile-box .worker-stats{
+    display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px;text-align:left;
+  }
+  html body.pv-redesign #app .detail-layout > .profile-box .worker-stats > span{min-width:0;}
+  html body.pv-redesign #app .detail-layout > .profile-box .worker-stats strong{
+    display:block;font-size:22px;line-height:1.4;font-weight:700;margin-bottom:4px;
+    white-space:normal;overflow-wrap:anywhere;
+  }
+}
+
+/* Keep the mobile theme control circular and prevent flex compression. */
+@media(max-width:760px){
+  html body.pv-redesign .header > .theme-toggle{
+    flex:0 0 36px!important;width:36px!important;height:36px!important;
+    min-width:36px!important;max-width:36px!important;
+    min-height:36px!important;max-height:36px!important;
+    box-sizing:border-box;aspect-ratio:1;border-radius:50%!important;
+    padding:0!important;align-self:center;
+  }
+}
+
+/* Availability is quieter than the pay amount on mobile details. */
+@media(max-width:600px){
+  html body.pv-redesign #app .detail-layout > .profile-box .worker-stats > span:nth-child(2) strong{
+    font-size:16px;line-height:1.5;
+  }
+}

@@ -11,6 +11,8 @@
   const ids = { jobs: new Map(), workers: new Map() };
   const categoryIds = new Map();
   const subcategoryIds = new Map();
+  let categoryLoadState = 'idle';
+  let categoryLoadPromise = null;
   let client = null;
   let authUser = null;
   let profile = null;
@@ -122,6 +124,46 @@
     setCache('dge-accounts', rows);
   }
 
+  function categoryAvailability(main, sub = '') {
+    return {state: categoryLoadState, available: categoryLoadState === 'ready' && categoryIds.has(main)
+      && (!sub || subcategoryIds.has(categoryIds.get(main) + '|' + sub))};
+  }
+
+  function ensureCategoryCatalog(force = false) {
+    if (categoryLoadPromise) return categoryLoadPromise;
+    if (!force && categoryLoadState === 'ready') return Promise.resolve();
+    categoryLoadState = 'loading';
+    categoryLoadPromise = (async () => {
+      try {
+        const [categoryRows, subcategoryRows] = await Promise.all([
+          optionalRows('categories', 'id,name,is_active', true),
+          optionalRows('subcategories', 'id,category_id,name,is_active', true)
+        ]);
+        // Display rename keeps the existing category UUID and historical links intact.
+        categoryRows.forEach(row => { if (row.name === 'ღონისძიებები') row.name = 'ღონისძიებები და ორგანიზება'; });
+        categoryRows.forEach(row => { if (row.name === 'ონლაინ / კომპიუტერული') row.name = 'კომპიუტერული მომსახურება'; });
+        categoryIds.clear();
+        subcategoryIds.clear();
+        const transportId = categoryRows.find(row => row.name === 'მიტანა და გადაადგილება')?.id;
+        subcategoryRows.forEach(row => { if (row.category_id === transportId && row.name === 'მანქანით დახმარება') row.name = 'მძღოლით/მანქანით დახმარება'; });
+        categoryRows.filter(row => row.is_active).forEach(row => categoryIds.set(row.name, row.id));
+        if (categoryIds.has('ღონისძიებები და ორგანიზება')) categoryIds.set('ღონისძიებები', categoryIds.get('ღონისძიებები და ორგანიზება'));
+        if (categoryIds.has('კომპიუტერული მომსახურება')) categoryIds.set('ონლაინ / კომპიუტერული', categoryIds.get('კომპიუტერული მომსახურება'));
+        subcategoryRows.filter(row => row.is_active || ['ღონისძიების დამხმარე','ქორწილის დამხმარე','სერვირების დამხმარე','უთოობა','ტანსაცმლის დალაგება','მძღოლი ერთი დღით'].includes(row.name)).forEach(row => {
+          subcategoryIds.set(row.category_id + '|' + row.name, row.id);
+          if (row.category_id === transportId && row.name === 'მძღოლით/მანქანით დახმარება') subcategoryIds.set(row.category_id + '|მანქანით დახმარება', row.id);
+        });
+
+        categoryLoadState = categoryIds.size ? 'ready' : 'empty';
+        return [categoryRows, subcategoryRows];
+      } catch {
+        categoryIds.clear(); subcategoryIds.clear(); categoryLoadState = 'error';
+        throw new Error('კატეგორიების ჩატვირთვა ვერ მოხერხდა. შეამოწმე ინტერნეტი და სცადე ხელახლა.');
+      } finally { categoryLoadPromise = null; }
+    })();
+    return categoryLoadPromise;
+  }
+
   async function load(onPrimaryReady) {
     const secondaryRowsPromise = Promise.all(authUser ? [
       optionalRows('saved_jobs'), optionalRows('saved_worker_profiles'),
@@ -134,27 +176,12 @@
       Promise.resolve([]), Promise.resolve([]), optionalRows('listing_views'),
       Promise.resolve([]), optionalRows('public_profiles', 'id,display_name,profile_photo_path')
     ]);
-    const [categoryRows, subcategoryRows, rawJobs, rawWorkers, jobLinks, workerLinks] = await Promise.all([
-      optionalRows('categories', 'id,name,is_active', true),
-      optionalRows('subcategories', 'id,category_id,name,is_active', true),
+    const [[categoryRows, subcategoryRows], rawJobs, rawWorkers, jobLinks, workerLinks] = await Promise.all([
+      ensureCategoryCatalog(true),
       optionalRows('job_posts', '*', true), optionalRows('worker_profiles', '*', true),
       optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
       optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
     ]);
-    // Display rename keeps the existing category UUID and historical links intact.
-    categoryRows.forEach(row => { if (row.name === 'ღონისძიებები') row.name = 'ღონისძიებები და ორგანიზება'; });
-    categoryRows.forEach(row => { if (row.name === 'ონლაინ / კომპიუტერული') row.name = 'კომპიუტერული მომსახურება'; });
-    categoryIds.clear();
-    subcategoryIds.clear();
-    const transportId = categoryRows.find(row => row.name === 'მიტანა და გადაადგილება')?.id;
-    subcategoryRows.forEach(row => { if (row.category_id === transportId && row.name === 'მანქანით დახმარება') row.name = 'მძღოლით/მანქანით დახმარება'; });
-    categoryRows.filter(row => row.is_active).forEach(row => categoryIds.set(row.name, row.id));
-    if (categoryIds.has('ღონისძიებები და ორგანიზება')) categoryIds.set('ღონისძიებები', categoryIds.get('ღონისძიებები და ორგანიზება'));
-    if (categoryIds.has('კომპიუტერული მომსახურება')) categoryIds.set('ონლაინ / კომპიუტერული', categoryIds.get('კომპიუტერული მომსახურება'));
-    subcategoryRows.filter(row => row.is_active || ['ღონისძიების დამხმარე','ქორწილის დამხმარე','სერვირების დამხმარე','უთოობა','ტანსაცმლის დალაგება','მძღოლი ერთი დღით'].includes(row.name)).forEach(row => {
-      subcategoryIds.set(row.category_id + '|' + row.name, row.id);
-      if (row.category_id === transportId && row.name === 'მძღოლით/მანქანით დახმარება') subcategoryIds.set(row.category_id + '|მანქანით დახმარება', row.id);
-    });
 
     const categoryById = new Map(categoryRows.map(row => [row.id, row]));
     const subcategoryById = new Map(subcategoryRows.map(row => [row.id, row]));
@@ -491,12 +518,15 @@
   }
 
   function validateCategorySelections(selections) {
+    if (categoryLoadState === 'loading' || categoryLoadState === 'idle') throw new Error('კატეგორიები ჯერ იტვირთება. ცოტა ხანში სცადე ხელახლა.');
+    if (categoryLoadState === 'error') throw new Error('კატეგორიების ჩატვირთვა ვერ მოხერხდა. შეამოწმე ინტერნეტი და სცადე ხელახლა.');
+    if (categoryLoadState === 'empty') throw new Error('გამოსაქვეყნებლად ხელმისაწვდომი კატეგორიები ვერ მოიძებნა. სცადე მოგვიანებით.');
     const requested = (selections || []).filter(item => item?.main);
     if (!requested.length) throw new Error('აირჩიე მინიმუმ ერთი კატეგორია.');
     const invalidMain = requested.find(item => !categoryIds.has(item.main));
-    if (invalidMain) throw new Error('კატეგორიების სია Supabase-ში ჯერ არ არის შევსებული.');
+    if (invalidMain) throw new Error('კატეგორია „' + invalidMain.main + '“ გამოსაქვეყნებლად ჯერ მიუწვდომელია. აირჩიე სხვა კატეგორია.');
     const invalidSub = requested.find(item => item.sub && !subcategoryIds.has(categoryIds.get(item.main) + '|' + item.sub));
-    if (invalidSub) throw new Error('ამ კატეგორიის ქვეკატეგორია Supabase-ში ვერ მოიძებნა.');
+    if (invalidSub) throw new Error('ქვეკატეგორია „' + invalidSub.sub + '“ ამ კატეგორიაში გამოსაქვეყნებლად ჯერ მიუწვდომელია. აირჩიე სხვა ქვეკატეგორია.');
     return requested;
   }
 
@@ -785,7 +815,7 @@
       setCache(key, rows);
       return row;
     },
-    validateCategorySelections,
+    validateCategorySelections, ensureCategoryCatalog, categoryAvailability,
     initialize, waitUntilReady, refreshSession, flush, get, set, accountRef, sameUser,
     resolveId, lookupProfileId, isAdmin, get client() { return client; },
     get authUser() { return authUser; }, get profile() { return profile; },

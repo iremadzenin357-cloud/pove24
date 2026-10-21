@@ -174,6 +174,27 @@ renderCategoryMenu=function(widget,query='',selectedMain=''){
  for(const [main,subs]of Object.entries(categoryGroups)){const mainMatch=main.toLocaleLowerCase('ka').includes(term),matching=subs.filter(sub=>sub.toLocaleLowerCase('ka').includes(term)&&!isSubSelected(main,sub));if(!isAllSelected(main)&&(!term||mainMatch||matching.length)){rows.push(`<button type="button" class="category-option category-main" data-cat-open="${esc(main)}"><span>${categoryIcons[main]} ${esc(main)}</span><span>›</span></button>`);if(term&&(mainMatch||matching.length))rows.push(`<button type="button" class="category-option category-all" data-cat-all="${esc(main)}">ყველა — ${esc(main)}</button>`);if(term)for(const sub of matching)rows.push(`<button type="button" class="category-option category-sub" data-cat-subchoice="${esc(sub)}" data-cat-parent="${esc(main)}">→ ${esc(sub)}</button>`)}}
  options.innerHTML=rows.length?rows.join(''):'<div class="category-no-results">კატეგორია ვერ მოიძებნა</div>'
 };
+// Posting options stay visible, but unavailable database IDs cannot be selected.
+const renderCatalogCategoryMenu=renderCategoryMenu;
+renderCategoryMenu=function(widget,query='',selectedMain=''){
+ renderCatalogCategoryMenu(widget,query,selectedMain);
+ if(!widget.closest('#postForm,#workerProfileForm')||!window.Pove24Store?.categoryAvailability)return;
+ const store=window.Pove24Store;
+ widget.querySelectorAll('[data-cat-open],[data-cat-all],[data-cat-subchoice]').forEach(button=>{
+  const main=button.dataset.catOpen||button.dataset.catAll||button.dataset.catParent,sub=button.dataset.catSubchoice||'';
+  const availability=store.categoryAvailability(main,sub);
+  if(!availability.available){button.disabled=true;button.setAttribute('aria-disabled','true');
+   const label=document.createElement('small');label.textContent=availability.state==='ready'?' — დროებით მიუწვდომელია':availability.state==='error'?' — ვერ ჩაიტვირთა':availability.state==='empty'?' — მიუწვდომელია':' — იტვირთება';button.append(label);}
+ });
+ if(store.categoryAvailability('').state!=='ready')store.ensureCategoryCatalog().then(()=>{
+  if(widget.isConnected&&!widget.querySelector('.category-popover').hidden&&store.categoryAvailability('').state==='ready')renderCategoryMenu(widget,query,selectedMain);
+ }).catch(()=>{
+  if(!widget.isConnected)return;
+  const options=widget.querySelector('[data-cat-options]');
+  const note=document.createElement('p');note.setAttribute('role','status');note.textContent='კატეგორიები ვერ ჩაიტვირთა. ხელახლა გახსენი სია.';options.append(note);
+ });
+};
+
 document.addEventListener('click',event=>{
  const remove=event.target.closest('[data-worker-skill-remove]');if(!remove)return;
  const field=remove.closest('[data-worker-skills-field]'),chip=remove.closest('[data-worker-skill-chip]'),widget=field?.querySelector('#cat-worker-skills-add'),popup=widget?.querySelector('.category-popover'),search=widget?.querySelector('[data-cat-search]'),wasOpen=!!popup&&!popup.hidden;

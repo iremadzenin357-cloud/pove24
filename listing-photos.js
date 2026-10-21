@@ -207,6 +207,7 @@
     const button=form.querySelector('.form-submit'),label=button?.textContent;
     if(button){button.disabled=true;button.textContent='ინახება…';}
     try {
+      await Pove24Store.ensureCategoryCatalog?.();
       const row=makeRow(form,state);
       await persistDraft(form);
       await core.saveWithPhotos({state,row,kind:state.kind,repo:repo(),saveListing:(kind,value)=>{

@@ -152,7 +152,7 @@ test('SQL concurrency checks ordered manifest rather than sorting away conflicts
 
 test('digital category has eight exact unique children, selected edit values and menu options in both flows',()=>{
  const source=fs.readFileSync(require.resolve('../geo-ui.js'),'utf8'),schedule=fs.readFileSync(require.resolve('../schedule.js'),'utf8');
- const ctx={categoryGroups:{},esc:x=>String(x).replaceAll('"','&quot;')};
+ const ctx={window:{},categoryGroups:{},esc:x=>String(x).replaceAll('"','&quot;')};
  vm.runInNewContext(source.slice(source.indexOf('Object.assign(categoryGroups,{'),source.indexOf('const legacyJobCategories')),ctx);
  const main='დიზაინი და ციფრული მომსახურება',expected=['ლოგო და ბრენდინგი','გრაფიკული დიზაინი','ვიდეომონტაჟი და ანიმაცია','ფოტოგრაფია და ფოტორედაქტირება','ვებსაიტებისა და აპლიკაციების შექმნა','მარკეტინგი და სოციალური ქსელები','AI და ციფრული კონტენტი','სხვა ციფრული მომსახურება'];
  assert.deepEqual(Array.from(ctx.categoryGroups[main]),expected);for(const sub of expected)assert.equal(Object.values(ctx.categoryGroups).flat().filter(x=>x===sub).length,1);

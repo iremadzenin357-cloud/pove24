@@ -11,3 +11,26 @@
 .detail-published-at .day-icon{width:15px;height:15px}
 html[data-theme="dark"] .detail-publication-meta{color:#c4d1c8}
 @media(max-width:480px){.detail-main-footer{gap:8px;margin-top:22px}.detail-publication-meta{gap:10px}.detail-publication-meta .listing-view-count,.detail-published-at{font-size:10px}.detail-main-footer>.report-link{font-size:10px}}
+
+/* Mobile detail footer: report action has its own readable, touch-sized row. */
+@media(max-width:600px){
+  body #app .detail-main .detail-main-footer{
+    display:grid;grid-template-columns:minmax(0,1fr);align-items:start;
+    gap:8px;margin-top:20px;padding-top:14px;
+  }
+  body #app .detail-main .detail-main-footer > .report-link{
+    display:flex;align-items:center;justify-content:flex-start;gap:7px;
+    width:100%;max-width:100%;min-width:0;min-height:44px;box-sizing:border-box;
+    margin:0;padding:8px 0;font-size:13px;line-height:1.5;text-align:left;
+    white-space:normal;overflow-wrap:anywhere;
+  }
+  body #app .detail-main .detail-main-footer > .report-link :is(svg,.report-link-icon){
+    flex-shrink:0;width:16px;height:16px;
+  }
+  body #app .detail-main .detail-main-footer > .detail-publication-meta{
+    width:100%;min-width:0;justify-content:space-between;flex-wrap:wrap;gap:6px 12px;
+  }
+  body #app .detail-main .detail-main-footer :is(.listing-view-count,.detail-published-at){
+    font-size:11px;line-height:1.5;
+  }
+}
