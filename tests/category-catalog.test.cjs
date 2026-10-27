@@ -16,7 +16,7 @@ function harness(){
  },console};
  vm.createContext(ctx);
  vm.runInContext("const categoryIds=new Map(),subcategoryIds=new Map();let categoryLoadState='idle',categoryLoadPromise=null;",ctx);
- vm.runInContext(source.slice(source.indexOf('  function categoryAvailability('),source.indexOf('  async function load(onPrimaryReady)')),ctx);
+ vm.runInContext(source.slice(source.indexOf('  function categoryAvailability('),source.indexOf('  async function load(onPrimaryReady')),ctx);
  vm.runInContext(source.slice(source.indexOf('  function validateCategorySelections('),source.indexOf('  async function upsertJob(')),ctx);
  vm.runInContext(source.slice(source.indexOf('  async function replaceCategories('),source.indexOf('  async function lookupProfileId(')),ctx);
  ctx.run=async p=>p;

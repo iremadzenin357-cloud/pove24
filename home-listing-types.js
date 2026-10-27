@@ -100,7 +100,28 @@
     const previous = section.querySelector('.home-feed-previous');
     previous.disabled = grid.scrollLeft <= 2;
     previous.hidden = previous.disabled;
-    section.querySelector('.home-feed-next').disabled = grid.scrollLeft >= max - 2;
+    section.querySelector('.home-feed-next').disabled = grid.scrollLeft >= max - 2 && !grid.poveMore;
+    if(grid.poveMore&&grid.scrollLeft>=max-grid.clientWidth)grid.poveLoadMore?.();
+  }
+  function connectRemoteHome(grid){
+    let page=1,pending=false;const seen=new Set();grid.poveMore=true;
+    grid.poveLoadMore=async()=>{
+      if(pending||!grid.poveMore||!grid.isConnected)return;pending=true;
+      try{
+        const result=await window.Pove24Store.listingQueries.rpcPage({kind:'home',page,size:12});
+        if(!grid.isConnected)return;
+        const rows=await window.Pove24Store.rememberListingRows(result.rows);
+        if(!grid.isConnected)return;
+        window.PoveSearchUI.syncCache();
+        const fresh=rows.filter(row=>{const key=row._kind+':'+row.uuid;if(seen.has(key))return false;seen.add(key);return true;});
+        const markup=fresh.map(row=>row._kind==='jobs'?jobMarkup(row):workerMarkup(row)).join('');
+        if(page===1)grid.innerHTML=markup||'<div class="empty"><strong>განცხადებები ჯერ არ არის</strong>გამოქვეყნებული განცხადებები აქ გამოჩნდება.</div>';
+        else grid.insertAdjacentHTML('beforeend',markup);
+        grid.poveMore=result.page<result.pages;page=result.page+1;
+      }catch(error){grid.poveMore=false;if(grid.isConnected)notify('საიტთან დაკავშირება ვერ მოხერხდა');}
+      finally{pending=false;if(grid.isConnected)requestAnimationFrame(()=>syncControls(grid));}
+    };
+    grid.poveLoadMore();
   }
   function updateHomeListings() {
     if (!homeHash()) return;
@@ -111,9 +132,11 @@
     grid.setAttribute('role','region');
     grid.setAttribute('aria-label','ბოლო განცხადებები');
     grid.tabIndex = 0;
-    const listings = allListings();
-    grid.innerHTML = listings.length ? listings.join('') : '<div class="empty"><strong>განცხადებები ჯერ არ არის</strong>გამოქვეყნებული განცხადებები აქ გამოჩნდება.</div>';
+    const remote=window.Pove24Store?.pagedListings;
+    const listings = remote ? [] : allListings();
+    grid.innerHTML = remote ? '' : listings.length ? listings.join('') : '<div class="empty"><strong>განცხადებები ჯერ არ არის</strong>გამოქვეყნებული განცხადებები აქ გამოჩნდება.</div>';
     grid.closest('#latest-jobs').querySelectorAll('.home-feed-controls button').forEach(button => button.setAttribute('aria-controls', grid.id));
+    if(remote)connectRemoteHome(grid);
     grid.addEventListener('scroll', () => syncControls(grid), {passive:true});
     enableFeedGestures(grid);
     resizeObserver?.disconnect();

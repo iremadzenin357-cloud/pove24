@@ -203,6 +203,7 @@
       // Keep the mounted form (including files and scroll position) in that case.
       if (event === 'SIGNED_IN' && session?.user?.id &&
           session.user.id === window.Pove24Store.accountRef()) return;
+      window.PoveListingRouteGuard?.begin();
       setTimeout(() => setCurrentUser().catch(error => console.error('[Pove24] Auth refresh failed:', error)), 0);
     }
   });

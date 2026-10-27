@@ -14,6 +14,8 @@
   let categoryLoadState = 'idle';
   let categoryLoadPromise = null;
   let client = null;
+  let dataGeneration=0;
+  let listingQueries = null, pagedListings = false, fullListingsLoaded = false, fullListingsPromise = null;
   let authUser = null;
   let profile = null;
   let writeQueue = Promise.resolve();
@@ -164,23 +166,25 @@
     return categoryLoadPromise;
   }
 
-  async function load(onPrimaryReady) {
+  async function load(onPrimaryReady, forceFull = false) {
+    const path=(location.hash||'#/').split('?')[0];
+    const limited=pagedListings&&!authUser&&!forceFull&&(/^#\/(?:jobs|workers|how)?$/.test(path)||/^#\/(?:job|worker)\//.test(path));
     const secondaryRowsPromise = Promise.all(authUser ? [
-      optionalRows('saved_jobs'), optionalRows('saved_worker_profiles'),
+      optionalRows('saved_jobs', 'job_post_id'), optionalRows('saved_worker_profiles', 'worker_profile_id'),
       optionalRows('saved_profiles'), optionalRows('reviews'), optionalRows('reports'),
-      optionalRows('review_reports'), optionalRows('listing_views'),
+      optionalRows('review_reports'), (limited ? [] : optionalRows('listing_views', 'job_post_id,worker_profile_id,total_views')),
       isAdmin() ? optionalRows('admin_activity') : Promise.resolve([]),
-      optionalRows('public_profiles', 'id,display_name,profile_photo_path')
+      (limited ? [] : optionalRows('public_profiles', 'id,display_name,profile_photo_path'))
     ] : [
       Promise.resolve([]), Promise.resolve([]), Promise.resolve([]), optionalRows('reviews'),
-      Promise.resolve([]), Promise.resolve([]), optionalRows('listing_views'),
-      Promise.resolve([]), optionalRows('public_profiles', 'id,display_name,profile_photo_path')
+      Promise.resolve([]), Promise.resolve([]), (limited ? [] : optionalRows('listing_views', 'job_post_id,worker_profile_id,total_views')),
+      Promise.resolve([]), (limited ? [] : optionalRows('public_profiles', 'id,display_name,profile_photo_path'))
     ]);
     const [[categoryRows, subcategoryRows], rawJobs, rawWorkers, jobLinks, workerLinks] = await Promise.all([
       ensureCategoryCatalog(true),
-      optionalRows('job_posts', '*', true), optionalRows('worker_profiles', '*', true),
-      optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
-      optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
+      limited ? [] : optionalRows('job_posts', '*', true), limited ? [] : optionalRows('worker_profiles', '*', true),
+      limited ? [] : optionalRows('job_post_categories', 'job_post_id,category_id,subcategory_id', true),
+      limited ? [] : optionalRows('worker_profile_categories', 'worker_profile_id,category_id,subcategory_id', true)
     ]);
 
     const categoryById = new Map(categoryRows.map(row => [row.id, row]));
@@ -248,6 +252,8 @@
     });
     setCache('dge-jobs', jobs);
     setCache('dge-workers', workers);
+    fullListingsLoaded=!limited;
+    if(limited&&/^#\/(?:job|worker)\//.test(path))await ensureListingDetail(path);
     onPrimaryReady?.();
 
     const [savedJobs, savedWorkers, savedProfiles, rawReviews,
@@ -461,6 +467,7 @@
         profile = null;
         setCache('dge-user', null);
       }
+      if(window.PoveListingQueries){listingQueries=window.PoveListingQueries.create(client);pagedListings=await listingQueries.available();}
       let resolvePrimary, rejectPrimary;
       const primaryReady = new Promise((resolve, reject) => {
         resolvePrimary = resolve;
@@ -479,7 +486,58 @@
     return startupLoadPromise;
   }
 
+  async function rememberListingRows(rows) {
+    const caller=accountRef(),epoch=dataGeneration;
+    for(const kind of ['jobs','workers']){
+      const incoming=rows.filter(r=>r._kind===kind).map(r=>({...r,owner:uiRef(r.owner),
+        initials:String(r.name||'').split(/\s+/).map(s=>s[0]).slice(0,2).join('')}));
+      if(!incoming.length)continue;
+      const key=kind==='jobs'?'dge-jobs':'dge-workers';
+      const merged=new Map((cache.get(key)||[]).map(r=>[r.uuid||r.id,r]));
+      for(const row of incoming){merged.set(row.uuid,row);ids[kind].set(String(row.id),row.uuid);}
+      setCache(key,[...merged.values()]);
+      const field=kind==='jobs'?'job_post_id':'worker_profile_id';
+      const views=await run(client.from('listing_views').select(field+',total_views').in(field,incoming.map(r=>r.uuid)));
+      if(caller!==accountRef()||epoch!==dataGeneration)throw new Error('ანგარიში შეიცვალა.');
+      const counts=cache.get('dge-view-counts-v1')||{jobs:{},profiles:{}};
+      const group=kind==='jobs'?'jobs':'profiles';counts[group]||={};
+      for(const row of views||[])counts[group][legacyId(kind,row[field])]=row.total_views;
+      setCache('dge-view-counts-v1',counts);
+    }
+    const ownerIds=[...new Set(rows.map(r=>r.owner).filter(Boolean))];
+    if(ownerIds.length){
+      const people=await run(client.from('public_profiles').select('id,display_name,profile_photo_path').in('id',ownerIds));
+      if(caller!==accountRef()||epoch!==dataGeneration)throw new Error('ანგარიში შეიცვალა.');
+      const accounts=new Map((cache.get('dge-accounts')||[]).map(r=>[r.id||r.email,r]));
+      for(const row of people||[])if(!sameUser(row.id))accounts.set(row.id,{...accounts.get(row.id),id:row.id,email:row.id,name:row.display_name,profilePhoto:row.profile_photo_path});
+      setCache('dge-accounts',[...accounts.values()]);
+    }
+    const saved=(cache.get('dge-saved')||[]).map(id=>legacyId('jobs',id));setCache('dge-saved',saved);
+    if(authUser)setCache('dge-saved-users',{[authUser.email]:saved});
+    return rows.map(r=>(cache.get(r._kind==='jobs'?'dge-jobs':'dge-workers')||[]).find(item=>item.uuid===r.uuid));
+  }
+  async function ensureListingDetail(path){
+    const match=path.match(/^#\/(job|worker)\/([^?]+)/);if(!pagedListings||!match)return;
+    const kind=match[1]==='job'?'jobs':'workers';
+    const result=await listingQueries.rpcPage({kind,id:decodeURIComponent(match[2]),size:1});
+    if(!result.rows.length){
+      const key=kind==='jobs'?'dge-jobs':'dge-workers',id=decodeURIComponent(match[2]);
+      setCache(key,(cache.get(key)||[]).filter(row=>String(row.id)!==id&&row.uuid!==id));
+      ids[kind].delete(id);
+    }
+    await rememberListingRows(result.rows);
+  }
+  function ensureLegacyListings(){
+    if(fullListingsLoaded)return Promise.resolve();
+    if(!fullListingsPromise)fullListingsPromise=load(null,true).finally(()=>{fullListingsPromise=null;});
+    return fullListingsPromise;
+  }
+
   async function refreshSession() {
+    const routeGuard=window.PoveListingRouteGuard,ticket=routeGuard?.begin();
+    try {
+    dataGeneration++;listingQueries?.invalidate();
+    fullListingsLoaded=false;
     const { data, error } = await client.auth.getSession();
     if (error) throw error;
     authUser = data.session?.user || null;
@@ -496,8 +554,13 @@
       setCache('dge-saved-profiles-users', {});
       await load();
     }
+    if(routeGuard&&!routeGuard.complete(ticket))return;
     window.Pove24AppBridge?.hydrate();
     return cache.get('dge-user');
+    } catch(error) {
+      routeGuard?.fail(ticket);
+      throw error;
+    }
   }
 
   function enqueue(task) {
@@ -809,6 +872,7 @@
       const existing = (cache.get(key) || []).find(item => String(item.id) === String(row.id));
       if (existing && !sameUser(existing.owner)) throw new Error('ამ განცხადების შეცვლის უფლება არ გაქვს.');
       await (kind === 'jobs' ? upsertJob(row) : upsertWorker(row));
+      listingQueries?.invalidate();
       const rows = [...(cache.get(key) || [])];
       const index = rows.findIndex(item => String(item.id) === String(row.id));
       if (index < 0) rows.unshift(row); else rows[index] = row;
@@ -816,6 +880,8 @@
       return row;
     },
     validateCategorySelections, ensureCategoryCatalog, categoryAvailability,
+    rememberListingRows, ensureListingDetail, ensureLegacyListings,
+    get pagedListings(){return pagedListings;}, get listingQueries(){return listingQueries;},
     initialize, waitUntilReady, refreshSession, flush, get, set, accountRef, sameUser,
     resolveId, lookupProfileId, isAdmin, get client() { return client; },
     get authUser() { return authUser; }, get profile() { return profile; },

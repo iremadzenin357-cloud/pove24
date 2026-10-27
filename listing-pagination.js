@@ -157,9 +157,40 @@
     return host.parentElement?.querySelector(`:scope > .listing-pagination[data-pagination-kind="${kind}"]`) || null;
   }
 
+  const remote={jobs:{},workers:{}};
+  function remoteResult(kind,host){
+    if(!window.Pove24Store?.pagedListings)return null;
+    const prepared=window.PoveSearchUI.prepare(kind,state[kind]);if(!prepared)return false;
+    const current=remote[kind];
+    if(current.host===host&&current.key===prepared.key&&current.result){
+      window.PoveSearchUI.paint(kind,current.result,prepared);return current.result;
+    }
+    if(current.pendingKey===prepared.key&&current.host===host)return false;
+    clearTimeout(current.timer);
+    const token=(current.token||0)+1;
+    Object.assign(current,{token,host,pendingKey:prepared.key,result:null});
+    host.setAttribute('aria-busy','true');host.setAttribute('inert','');
+    current.timer=setTimeout(async()=>{
+      try{
+        const result=await window.Pove24Store.listingQueries.compatiblePage(prepared.request,prepared.matches,prepared.residual,()=>current.token===token&&host.isConnected&&hostFor(kind)===host);
+        if(current.token!==token||!host.isConnected||hostFor(kind)!==host)return;
+        result.rows=await window.Pove24Store.rememberListingRows(result.rows);
+        if(current.token!==token||!host.isConnected||hostFor(kind)!==host)return;
+        state[kind].page=result.page;
+        current.key=window.PoveSearchUI.prepare(kind,state[kind]).key;current.result=result;
+        current.pendingKey=null;render(kind);
+      }catch(error){
+        if(current.token===token&&host.isConnected&&hostFor(kind)===host){current.pendingKey=null;notify('საიტთან დაკავშირება ვერ მოხერხდა');}
+      }finally{if(current.token===token){host.removeAttribute('aria-busy');host.removeAttribute('inert');}}
+    },180);
+    return false;
+  }
+
   function render(kind) {
     const host = hostFor(kind);
     if (!host) return;
+    const result=remoteResult(kind,host);
+    if(result===false)return;
 
     const grid = kind === 'jobs' ? host.querySelector('.job-grid') : host;
     const cards = grid ? [...grid.querySelectorAll(':scope > .job-card, :scope > .worker-card')] : [];
@@ -170,11 +201,11 @@
       return;
     }
 
-    const sortedCards = sortCards(kind, grid, cards);
+    const sortedCards = result ? cards : sortCards(kind, grid, cards);
     grid.classList.toggle('is-list-view', state[kind].view === 'list');
     grid.classList.toggle('is-grid-view', state[kind].view === 'grid');
     const paymentFilterActive = (state[kind].sort === 'price-asc' || state[kind].sort === 'price-desc') && !!state[kind].paymentType && state[kind].paymentType !== 'all';
-    ensureToolbar(kind, host, grid, sortedCards.length, paymentFilterActive);
+    ensureToolbar(kind, host, grid, result ? result.total : sortedCards.length, paymentFilterActive);
     const emptyMessage = document.querySelector(`.listing-filter-empty[data-listing-kind="${kind}"]`);
     if (paymentFilterActive && !sortedCards.length) {
       if (!emptyMessage) {
@@ -189,11 +220,11 @@
     }
 
     const size = pageSize(kind, state[kind].view);
-    const pageCount = Math.ceil(sortedCards.length / size);
+    const pageCount = result ? result.pages : Math.ceil(sortedCards.length / size);
     state[kind].page = Math.max(1, Math.min(state[kind].page, pageCount));
     const start = (state[kind].page - 1) * size;
     sortedCards.forEach((card, index) => {
-      card.hidden = index < start || index >= start + size;
+      card.hidden = result ? false : index < start || index >= start + size;
     });
 
     let nav = pagerFor(kind, host);
@@ -223,6 +254,7 @@
     if (typeof original !== 'function') return;
     window[name] = function (...args) {
       state[kind].page = 1;
+      if(window.Pove24Store?.pagedListings){remote[kind].key=null;remote[kind].result=null;render(kind);return;}
       const result = original.apply(this, args);
       render(kind);
       return result;

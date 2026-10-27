@@ -41,9 +41,9 @@
     'feature-config.js?v=20260930-ratings-off',
     'avatar.js',
     'profile-media.js?v=20261004-photo-hint-no-repeat',
-    'app.js?v=20261008-seamless-startup-v1',
-    'flow.js?v=20261008-seamless-startup-v1',
-    'geo-ui.js?v=20261021-nurse-subcategory',
+    'app.js?v=20261022-cache-revalidation',
+    'flow.js?v=20261022-cache-revalidation',
+    'geo-ui.js?v=20261022-cache-revalidation',
     'design-home.js?v=20261008-redesign',
     'ratings.js?v=20261019-remove-worker-completed-count',
     'listing-photos-core.js?v=20261011-photo-completion-v3',
@@ -59,19 +59,21 @@
     'location-ux.js',
     'how-menu.js?v=20261008-features-off',
     'profile-social.js?v=20261008-features-off',
-    'auth-ui.js?v=20261008-features-off',
+    'auth-ui.js?v=20261022-pove24',
     'georgian-validation.js',
     'owner-listing-actions.js?v=20261008-features-off',
     'ratings-feature.js?v=20261008-features-off',
     'job-search-save.js?v=20260930-hide-search-subcategory',
     'view-counts.js?v=20261008-job-status-placement',
     'worker-search-filters.js?v=20261007-worker-city-area',
-    'listing-pagination.js?v=20261008-status-group-order',
-    'home-listing-types.js?v=20261008-active-home-jobs',
-    'navigation-performance.js?v=20261008-seamless-startup-v1',
+    'listing-search-ui.js?v=20261023-paging',
+    'listing-pagination.js?v=20261023-paging',
+    'home-listing-types.js?v=20261023-paging',
+    'navigation-performance.js?v=20261022-cache-revalidation',
     'design-interactions.js?v=20261008-redesign',
     'photo-moderation.js?v=20261011-infrastructure-fixes-v2',
-    'account-deletion.js?v=20261011-local-v1'
+    'account-deletion.js?v=20261011-local-v1',
+    'listing-route-data.js?v=20261023-paging'
   ];
 
   function loadScriptsInOrder(sources, continueOnError = false) {
@@ -100,21 +102,23 @@
     });
   }
 
-  const preloadedScripts = preloadScripts([...legacyScriptUrls, 'supabase-auth.js']);
+  const authScriptUrl = 'supabase-auth.js?v=20261022-domain-fix';
+  const preloadedScripts = preloadScripts([...legacyScriptUrls, authScriptUrl]);
   try {
     await loadScriptsInOrder([
       'https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2',
       'supabase-config.js',
       'supabase-client.js?v=20261011-recovery',
       'phone-validation.js?v=20261008-georgian-mobile-prefix-neutral-focus',
-      'supabase-data.js?v=20261008-parallel-startup-v2'
+      'listing-query-core.js?v=20261023-paging',
+      'supabase-data.js?v=20261023-paging'
     ]);
 
     // Fetch app scripts alongside Supabase's first data load; execute them only
     // after the signed-in state is ready, so protected routes keep their behavior.
     await window.Pove24Store.initialize();
-    await loadScriptsInOrder(['supabase-auth.js?v=20261011-recovery']);
-    await loadScriptsInOrder(legacyScriptUrls, true);
+    await loadScriptsInOrder([authScriptUrl]);
+    await loadScriptsInOrder(legacyScriptUrls);
     preloadedScripts.forEach(link => link.remove());
     window.Pove24AppBridge?.hydrate();
     await window.Pove24Store.waitUntilReady();
