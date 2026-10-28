@@ -47,9 +47,9 @@
   }
   function create(client){
     if(!client?.from)throw new TypeError('Supabase client required');
-    const pending=new Map();
+    const pending=new Map(),rpcPending=new Map();
     let generation=0;
-    function invalidate(){generation++;pending.clear();}
+    function invalidate(){generation++;pending.clear();rpcPending.clear();}
     async function execute(request){
       const {kind,page,size,sort,filters}=request;
       const ranks=kind==='jobs'?['active','completed','other']:[null];
@@ -110,7 +110,7 @@
       if(error){if(['PGRST202','42883'].includes(error.code))return false;throw new Error('Listing service unavailable');}
       return data?.version===1;
     }
-    async function rpcPage(input){
+    async function readRpcPage(input){
       const {kind,page:pageNumber=1,size=12,sort='newest',city='',paymentType='',id=null}=input;
       if(!['jobs','workers','home'].includes(kind))throw new TypeError('Invalid listing kind');
       integer(pageNumber,1,90071992547409);integer(size,1,100);
@@ -125,6 +125,17 @@
         !Number.isSafeInteger(value.page)||value.page<1||value.pages!==Math.ceil(value.total/size)||
         value.size!==size||value.rows.length>size)throw new Error('Invalid listing response');
       return value;
+    }
+    async function rpcPage(input){
+      const key=JSON.stringify(input);
+      if(!rpcPending.has(key)){
+        const request=readRpcPage(input).finally(()=>{
+          if(rpcPending.get(key)===request)rpcPending.delete(key);
+        });
+        rpcPending.set(key,request);
+      }
+      // Share only in-flight reads, never settled results or mutable UI objects.
+      return structuredClone(await rpcPending.get(key));
     }
     async function compatiblePage(input, matches, residual=false, isCurrent=()=>true){
       if(!residual)return rpcPage(input);

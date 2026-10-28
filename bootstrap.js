@@ -67,7 +67,7 @@
     'view-counts.js?v=20261008-job-status-placement',
     'worker-search-filters.js?v=20261007-worker-city-area',
     'listing-search-ui.js?v=20261023-paging',
-    'listing-pagination.js?v=20261023-paging',
+    'listing-pagination.js?v=20261028-loading-latency',
     'home-listing-types.js?v=20261023-paging',
     'navigation-performance.js?v=20261022-cache-revalidation',
     'design-interactions.js?v=20261008-redesign',
@@ -110,8 +110,8 @@
       'supabase-config.js',
       'supabase-client.js?v=20261011-recovery',
       'phone-validation.js?v=20261008-georgian-mobile-prefix-neutral-focus',
-      'listing-query-core.js?v=20261023-paging',
-      'supabase-data.js?v=20261023-paging'
+      'listing-query-core.js?v=20261028-loading-latency',
+      'supabase-data.js?v=20261028-loading-latency'
     ]);
 
     // Fetch app scripts alongside Supabase's first data load; execute them only

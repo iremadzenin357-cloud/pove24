@@ -488,6 +488,16 @@
 
   async function rememberListingRows(rows) {
     const caller=accountRef(),epoch=dataGeneration;
+    const ownerIds=[...new Set(rows.map(r=>r.owner).filter(Boolean))];
+    const [jobViews,workerViews,people]=await Promise.all([
+      ...['jobs','workers'].map(kind=>{
+        const keys=rows.filter(r=>r._kind===kind).map(r=>r.uuid);
+        const field=kind==='jobs'?'job_post_id':'worker_profile_id';
+        return keys.length?run(client.from('listing_views').select(field+',total_views').in(field,keys)):[];
+      }),
+      ownerIds.length?run(client.from('public_profiles').select('id,display_name,profile_photo_path').in('id',ownerIds)):[]
+    ]);
+    if(caller!==accountRef()||epoch!==dataGeneration)throw new Error('ანგარიში შეიცვალა.');
     for(const kind of ['jobs','workers']){
       const incoming=rows.filter(r=>r._kind===kind).map(r=>({...r,owner:uiRef(r.owner),
         initials:String(r.name||'').split(/\s+/).map(s=>s[0]).slice(0,2).join('')}));
@@ -497,17 +507,13 @@
       for(const row of incoming){merged.set(row.uuid,row);ids[kind].set(String(row.id),row.uuid);}
       setCache(key,[...merged.values()]);
       const field=kind==='jobs'?'job_post_id':'worker_profile_id';
-      const views=await run(client.from('listing_views').select(field+',total_views').in(field,incoming.map(r=>r.uuid)));
-      if(caller!==accountRef()||epoch!==dataGeneration)throw new Error('ანგარიში შეიცვალა.');
+      const views=kind==='jobs'?jobViews:workerViews;
       const counts=cache.get('dge-view-counts-v1')||{jobs:{},profiles:{}};
       const group=kind==='jobs'?'jobs':'profiles';counts[group]||={};
       for(const row of views||[])counts[group][legacyId(kind,row[field])]=row.total_views;
       setCache('dge-view-counts-v1',counts);
     }
-    const ownerIds=[...new Set(rows.map(r=>r.owner).filter(Boolean))];
     if(ownerIds.length){
-      const people=await run(client.from('public_profiles').select('id,display_name,profile_photo_path').in('id',ownerIds));
-      if(caller!==accountRef()||epoch!==dataGeneration)throw new Error('ანგარიში შეიცვალა.');
       const accounts=new Map((cache.get('dge-accounts')||[]).map(r=>[r.id||r.email,r]));
       for(const row of people||[])if(!sameUser(row.id))accounts.set(row.id,{...accounts.get(row.id),id:row.id,email:row.id,name:row.display_name,profilePhoto:row.profile_photo_path});
       setCache('dge-accounts',[...accounts.values()]);

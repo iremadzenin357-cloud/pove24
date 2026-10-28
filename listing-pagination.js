@@ -162,6 +162,7 @@
     if(!window.Pove24Store?.pagedListings)return null;
     const prepared=window.PoveSearchUI.prepare(kind,state[kind]);if(!prepared)return false;
     const current=remote[kind];
+    const delay=current.host===host?180:0;
     if(current.host===host&&current.key===prepared.key&&current.result){
       window.PoveSearchUI.paint(kind,current.result,prepared);return current.result;
     }
@@ -182,7 +183,7 @@
       }catch(error){
         if(current.token===token&&host.isConnected&&hostFor(kind)===host){current.pendingKey=null;notify('საიტთან დაკავშირება ვერ მოხერხდა');}
       }finally{if(current.token===token){host.removeAttribute('aria-busy');host.removeAttribute('inert');}}
-    },180);
+    },delay);
     return false;
   }
 
